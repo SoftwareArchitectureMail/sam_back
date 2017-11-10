@@ -1,0 +1,1710 @@
+  [1m[35m (299.6ms)[0m  [1m[35mCREATE TABLE "schema_migrations" ("version" character varying NOT NULL PRIMARY KEY)[0m
+  [1m[35m (86.1ms)[0m  [1m[35mCREATE TABLE "ar_internal_metadata" ("key" character varying NOT NULL PRIMARY KEY, "value" character varying, "created_at" timestamp NOT NULL, "updated_at" timestamp NOT NULL)[0m
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT pg_try_advisory_lock(6931697059447046565)[0m
+  [1m[35m (0.5ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to AddRpush (20170921050234)
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (75.3ms)[0m  [1m[35mCREATE TABLE "rapns_notifications" ("id" bigserial primary key, "badge" integer, "device_token" character varying(64) NOT NULL, "sound" character varying DEFAULT '1.aiff', "alert" character varying, "attributes_for_device" text, "expiry" integer DEFAULT 86400 NOT NULL, "delivered" boolean DEFAULT 'f' NOT NULL, "delivered_at" timestamp, "failed" boolean DEFAULT 'f' NOT NULL, "failed_at" timestamp, "error_code" integer, "error_description" character varying, "deliver_after" timestamp, "created_at" timestamp NOT NULL, "updated_at" timestamp NOT NULL)[0m
+  [1m[35m (30.4ms)[0m  [1m[35mCREATE  INDEX  "index_rapns_notifications_multi" ON "rapns_notifications"  ("delivered", "failed", "deliver_after")[0m
+  [1m[35m (33.0ms)[0m  [1m[35mCREATE TABLE "rapns_feedback" ("id" bigserial primary key, "device_token" character varying(64) NOT NULL, "failed_at" timestamp NOT NULL, "created_at" timestamp NOT NULL, "updated_at" timestamp NOT NULL)[0m
+  [1m[35m (53.5ms)[0m  [1m[35mCREATE  INDEX  "index_rapns_feedback_on_device_token" ON "rapns_feedback"  ("device_token")[0m
+  [1m[35m (99.5ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ADD "alert_is_json" boolean DEFAULT 'f'[0m
+  [1m[35m (0.5ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ADD "app" character varying[0m
+  [1m[35m (31.1ms)[0m  [1m[35mALTER TABLE "rapns_feedback" ADD "app" character varying[0m
+  [1m[35m (66.3ms)[0m  [1m[35mCREATE TABLE "rapns_apps" ("id" bigserial primary key, "key" character varying NOT NULL, "environment" character varying NOT NULL, "certificate" text NOT NULL, "password" character varying, "connections" integer DEFAULT 1 NOT NULL, "created_at" timestamp NOT NULL, "updated_at" timestamp NOT NULL)[0m
+  [1m[35m (0.5ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ADD "type" character varying[0m
+  [1m[35m (0.4ms)[0m  [1m[35mALTER TABLE "rapns_apps" ADD "type" character varying[0m
+  [1m[35mSQL (0.5ms)[0m  [1m[33mUPDATE "rapns_notifications" SET "type" = 'Rapns::Apns::Notification'[0m
+  [1m[35mSQL (0.3ms)[0m  [1m[33mUPDATE "rapns_apps" SET "type" = 'Rapns::Apns::App'[0m
+  [1m[35m (0.3ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER COLUMN "type" TYPE character varying[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER "type" SET NOT NULL[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "rapns_apps" ALTER COLUMN "type" TYPE character varying[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "rapns_apps" ALTER "type" SET NOT NULL[0m
+  [1m[35m (0.3ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER COLUMN "device_token" TYPE character varying(64)[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER "device_token" DROP NOT NULL[0m
+  [1m[35m (0.5ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER COLUMN "expiry" TYPE integer[0m
+  [1m[35m (0.3ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER COLUMN "expiry" SET DEFAULT 86400[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER "expiry" DROP NOT NULL[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "rapns_apps" ALTER COLUMN "environment" TYPE character varying[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "rapns_apps" ALTER "environment" DROP NOT NULL[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "rapns_apps" ALTER COLUMN "certificate" TYPE text[0m
+  [1m[35m (0.1ms)[0m  [1m[35mALTER TABLE "rapns_apps" ALTER COLUMN "certificate" DROP DEFAULT[0m
+  [1m[35m (0.1ms)[0m  [1m[35mALTER TABLE "rapns_apps" ALTER "certificate" DROP NOT NULL[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER COLUMN "error_description" TYPE text[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER COLUMN "error_description" DROP DEFAULT[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER "error_description" DROP NOT NULL[0m
+  [1m[35m (0.7ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER COLUMN "sound" TYPE character varying[0m
+  [1m[35m (0.3ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER COLUMN "sound" SET DEFAULT 'default'[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "rapns_notifications" RENAME COLUMN "attributes_for_device" TO "data"[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "rapns_apps" RENAME COLUMN "key" TO "name"[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "rapns_apps" ADD "auth_key" character varying[0m
+  [1m[35m (0.3ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ADD "collapse_key" character varying[0m
+  [1m[35m (107.8ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ADD "delay_while_idle" boolean DEFAULT 'f' NOT NULL[0m
+  [1m[35m (0.6ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ADD "registration_ids" text[0m
+  [1m[35m (0.5ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ADD "app_id" integer[0m
+  [1m[35m (152.4ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ADD "retries" integer DEFAULT 0[0m
+  [1m[36mAddRpush::AddGcm::Rapns::App Load (0.6ms)[0m  [1m[34mSELECT "rapns_apps".* FROM "rapns_apps"[0m
+  [1m[35m (0.5ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER COLUMN "app_id" TYPE integer[0m
+  [1m[35m (0.4ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER "app_id" SET NOT NULL[0m
+  [1m[35m (0.5ms)[0m  [1m[35mALTER TABLE "rapns_notifications" DROP "app"[0m
+DEPRECATION WARNING: Passing default to #index_name_exists? is deprecated without replacement. (called from up at /home/steven/Documents/Arqui/Project/sam_notifications_ms/db/migrate/20170921050234_add_rpush.rb:184)
+  [1m[35m (0.3ms)[0m  [1m[35mDROP INDEX  "index_rapns_notifications_multi"[0m
+  [1m[35m (30.6ms)[0m  [1m[35mCREATE  INDEX  "index_rapns_notifications_multi" ON "rapns_notifications"  ("app_id", "delivered", "failed", "deliver_after")[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ADD "uri" character varying[0m
+  [1m[35m (0.3ms)[0m  [1m[35mALTER TABLE "rapns_apps" ADD "client_id" character varying[0m
+  [1m[35m (0.4ms)[0m  [1m[35mALTER TABLE "rapns_apps" ADD "client_secret" character varying[0m
+  [1m[35m (2.2ms)[0m  [1m[35mALTER TABLE "rapns_apps" ADD "access_token" character varying[0m
+  [1m[35m (0.4ms)[0m  [1m[35mALTER TABLE "rapns_apps" ADD "access_token_expiration" timestamp[0m
+  [1m[35m (0.4ms)[0m  [1m[35mALTER TABLE "rapns_notifications" RENAME TO "rpush_notifications"[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "public"."rapns_notifications_id_seq" RENAME TO "rpush_notifications_id_seq"[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER INDEX "rapns_notifications_pkey" RENAME TO "rpush_notifications_pkey"[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "rapns_apps" RENAME TO "rpush_apps"[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "public"."rapns_apps_id_seq" RENAME TO "rpush_apps_id_seq"[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER INDEX "rapns_apps_pkey" RENAME TO "rpush_apps_pkey"[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "rapns_feedback" RENAME TO "rpush_feedback"[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "public"."rapns_feedback_id_seq" RENAME TO "rpush_feedback_id_seq"[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER INDEX "rapns_feedback_pkey" RENAME TO "rpush_feedback_pkey"[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER INDEX "index_rapns_feedback_on_device_token" RENAME TO "index_rpush_feedback_on_device_token"[0m
+DEPRECATION WARNING: Passing default to #index_name_exists? is deprecated without replacement. (called from up at /home/steven/Documents/Arqui/Project/sam_notifications_ms/db/migrate/20170921050234_add_rpush.rb:296)
+  [1m[35m (0.2ms)[0m  [1m[35mALTER INDEX "index_rapns_notifications_multi" RENAME TO "index_rpush_notifications_multi"[0m
+DEPRECATION WARNING: Passing default to #index_name_exists? is deprecated without replacement. (called from up at /home/steven/Documents/Arqui/Project/sam_notifications_ms/db/migrate/20170921050234_add_rpush.rb:300)
+  [1m[35mSQL (0.6ms)[0m  [1m[33mUPDATE "rpush_notifications" SET "type" = 'Rpush::Apns::Notification' WHERE "rpush_notifications"."type" = $1[0m  [["type", "Rapns::Apns::Notification"]]
+  [1m[35mSQL (0.3ms)[0m  [1m[33mUPDATE "rpush_notifications" SET "type" = 'Rpush::Gcm::Notification' WHERE "rpush_notifications"."type" = $1[0m  [["type", "Rapns::Gcm::Notification"]]
+  [1m[35mSQL (0.2ms)[0m  [1m[33mUPDATE "rpush_notifications" SET "type" = 'Rpush::Adm::Notification' WHERE "rpush_notifications"."type" = $1[0m  [["type", "Rapns::Adm::Notification"]]
+  [1m[35mSQL (0.2ms)[0m  [1m[33mUPDATE "rpush_notifications" SET "type" = 'Rpush::Wpns::Notification' WHERE "rpush_notifications"."type" = $1[0m  [["type", "Rapns::Wpns::Notification"]]
+  [1m[35mSQL (0.4ms)[0m  [1m[33mUPDATE "rpush_apps" SET "type" = 'Rpush::Apns::App' WHERE "rpush_apps"."type" = $1[0m  [["type", "Rapns::Apns::App"]]
+  [1m[35mSQL (0.2ms)[0m  [1m[33mUPDATE "rpush_apps" SET "type" = 'Rpush::Gcm::App' WHERE "rpush_apps"."type" = $1[0m  [["type", "Rapns::Gcm::App"]]
+  [1m[35mSQL (0.2ms)[0m  [1m[33mUPDATE "rpush_apps" SET "type" = 'Rpush::Adm::App' WHERE "rpush_apps"."type" = $1[0m  [["type", "Rapns::Adm::App"]]
+  [1m[35mSQL (0.3ms)[0m  [1m[33mUPDATE "rpush_apps" SET "type" = 'Rpush::Wpns::App' WHERE "rpush_apps"."type" = $1[0m  [["type", "Rapns::Wpns::App"]]
+  [1m[35m (0.3ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ADD "fail_after" timestamp[0m
+  [1m[35mSQL (0.3ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20170921050234"]]
+  [1m[35m (21.1ms)[0m  [1m[35mCOMMIT[0m
+Migrating to Rpush200Updates (20170921050235)
+  [1m[35m (0.4ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (117.4ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ADD "processing" boolean DEFAULT 'f' NOT NULL[0m
+  [1m[35m (0.3ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ADD "priority" integer[0m
+DEPRECATION WARNING: Passing default to #index_name_exists? is deprecated without replacement. (called from up at /home/steven/Documents/Arqui/Project/sam_notifications_ms/db/migrate/20170921050235_rpush_2_0_0_updates.rb:20)
+  [1m[35m (0.1ms)[0m  [1m[35mDROP INDEX  "index_rpush_notifications_multi"[0m
+  [1m[35m (30.4ms)[0m  [1m[35mCREATE  INDEX  "index_rpush_notifications_multi" ON "rpush_notifications"  ("delivered", "failed") WHERE NOT delivered AND NOT failed[0m
+  [1m[35m (0.4ms)[0m  [1m[35mALTER TABLE "rpush_feedback" RENAME COLUMN "app" TO "app_id"[0m
+  [1m[35m (106.9ms)[0m  [1m[35mALTER TABLE rpush_feedback ALTER COLUMN app_id TYPE integer USING (trim(app_id)::integer)[0m
+  [1m[35mSQL (0.4ms)[0m  [1m[33mUPDATE "rpush_apps" SET "type" = 'Rpush::Client::ActiveRecord::Apns::App' WHERE "rpush_apps"."type" = $1[0m  [["type", "Rpush::Apns::App"]]
+  [1m[35mSQL (0.3ms)[0m  [1m[33mUPDATE "rpush_notifications" SET "type" = 'Rpush::Client::ActiveRecord::Apns::Notification' WHERE "rpush_notifications"."type" = $1[0m  [["type", "Rpush::Apns::Notification"]]
+  [1m[35mSQL (0.2ms)[0m  [1m[33mUPDATE "rpush_apps" SET "type" = 'Rpush::Client::ActiveRecord::Gcm::App' WHERE "rpush_apps"."type" = $1[0m  [["type", "Rpush::Gcm::App"]]
+  [1m[35mSQL (0.3ms)[0m  [1m[33mUPDATE "rpush_notifications" SET "type" = 'Rpush::Client::ActiveRecord::Gcm::Notification' WHERE "rpush_notifications"."type" = $1[0m  [["type", "Rpush::Gcm::Notification"]]
+  [1m[35mSQL (0.2ms)[0m  [1m[33mUPDATE "rpush_apps" SET "type" = 'Rpush::Client::ActiveRecord::Wpns::App' WHERE "rpush_apps"."type" = $1[0m  [["type", "Rpush::Wpns::App"]]
+  [1m[35mSQL (0.3ms)[0m  [1m[33mUPDATE "rpush_notifications" SET "type" = 'Rpush::Client::ActiveRecord::Wpns::Notification' WHERE "rpush_notifications"."type" = $1[0m  [["type", "Rpush::Wpns::Notification"]]
+  [1m[35mSQL (0.3ms)[0m  [1m[33mUPDATE "rpush_apps" SET "type" = 'Rpush::Client::ActiveRecord::Adm::App' WHERE "rpush_apps"."type" = $1[0m  [["type", "Rpush::Adm::App"]]
+  [1m[35mSQL (0.3ms)[0m  [1m[33mUPDATE "rpush_notifications" SET "type" = 'Rpush::Client::ActiveRecord::Adm::Notification' WHERE "rpush_notifications"."type" = $1[0m  [["type", "Rpush::Adm::Notification"]]
+  [1m[35mSQL (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20170921050235"]]
+  [1m[35m (82.3ms)[0m  [1m[35mCOMMIT[0m
+Migrating to Rpush210Updates (20170921050236)
+  [1m[35m (0.3ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.6ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ADD "url_args" text[0m
+  [1m[35m (0.4ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ADD "category" character varying[0m
+  [1m[35mSQL (0.4ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20170921050236"]]
+  [1m[35m (38.3ms)[0m  [1m[35mCOMMIT[0m
+Migrating to Rpush260Updates (20170921050237)
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (209.7ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ADD "content_available" boolean DEFAULT 'f'[0m
+  [1m[35mSQL (0.3ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20170921050237"]]
+  [1m[35m (9.5ms)[0m  [1m[35mCOMMIT[0m
+Migrating to Rpush270Updates (20170921050238)
+  [1m[35m (0.4ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.5ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ALTER COLUMN "alert" TYPE text[0m
+  [1m[35m (0.4ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ADD "notification" text[0m
+  [1m[35mSQL (0.4ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20170921050238"]]
+  [1m[35m (5.3ms)[0m  [1m[35mCOMMIT[0m
+Migrating to Rpush300Updates (20170921050239)
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (101.0ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ADD "mutable_content" boolean DEFAULT 'f'[0m
+  [1m[35m (1.1ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ALTER COLUMN "sound" TYPE character varying[0m
+  [1m[35m (0.5ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ALTER COLUMN "sound" DROP DEFAULT[0m
+  [1m[35mSQL (0.5ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20170921050239"]]
+  [1m[35m (10.9ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.6ms)[0m  [1m[34mSELECT  "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1 LIMIT $2[0m  [["key", "environment"], ["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.4ms)[0m  [1m[32mINSERT INTO "ar_internal_metadata" ("key", "value", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "key"[0m  [["key", "environment"], ["value", "development"], ["created_at", "2017-09-21 05:03:11.029881"], ["updated_at", "2017-09-21 05:03:11.029881"]]
+  [1m[35m (6.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT pg_advisory_unlock(6931697059447046565)[0m
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT pg_try_advisory_lock(6931697059447046565)[0m
+  [1m[35m (0.4ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to CreateNotifications (20170921050541)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (163.4ms)[0m  [1m[35mCREATE TABLE "notifications" ("id" bigserial primary key, "username" character varying, "registration_id" character varying, "created_at" timestamp NOT NULL, "updated_at" timestamp NOT NULL)[0m
+  [1m[35mSQL (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20170921050541"]]
+  [1m[35m (9.1ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.5ms)[0m  [1m[34mSELECT  "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1 LIMIT $2[0m  [["key", "environment"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT pg_advisory_unlock(6931697059447046565)[0m
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Started GET "/" for 127.0.0.1 at 2017-09-21 00:06:39 -0500
+  [1m[35m (0.5ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Processing by Rails::WelcomeController#index as HTML
+  Rendering /home/steven/.rbenv/versions/2.3.4/lib/ruby/gems/2.3.0/gems/railties-5.1.4/lib/rails/templates/rails/welcome/index.html.erb
+  Rendered /home/steven/.rbenv/versions/2.3.4/lib/ruby/gems/2.3.0/gems/railties-5.1.4/lib/rails/templates/rails/welcome/index.html.erb (3.8ms)
+Completed 200 OK in 30ms (Views: 14.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/favicon.ico" for 127.0.0.1 at 2017-09-21 00:06:39 -0500
+  
+ActionController::RoutingError (No route matches [GET] "/favicon.ico"):
+  
+actionpack (5.1.4) lib/action_dispatch/middleware/debug_exceptions.rb:63:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/show_exceptions.rb:31:in `call'
+railties (5.1.4) lib/rails/rack/logger.rb:36:in `call_app'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `block in call'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `block in tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:26:in `tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `tagged'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/remote_ip.rb:79:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/request_id.rb:25:in `call'
+rack (2.0.3) lib/rack/runtime.rb:22:in `call'
+activesupport (5.1.4) lib/active_support/cache/strategy/local_cache_middleware.rb:27:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/executor.rb:12:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/static.rb:125:in `call'
+rack (2.0.3) lib/rack/sendfile.rb:111:in `call'
+railties (5.1.4) lib/rails/engine.rb:522:in `call'
+puma (3.10.0) lib/puma/configuration.rb:225:in `call'
+puma (3.10.0) lib/puma/server.rb:605:in `handle_request'
+puma (3.10.0) lib/puma/server.rb:437:in `process_client'
+puma (3.10.0) lib/puma/server.rb:301:in `block in run'
+puma (3.10.0) lib/puma/thread_pool.rb:120:in `block in spawn_thread'
+Started GET "/serviceworker.js" for 127.0.0.1 at 2017-09-21 00:06:40 -0500
+  
+ActionController::RoutingError (No route matches [GET] "/serviceworker.js"):
+  
+actionpack (5.1.4) lib/action_dispatch/middleware/debug_exceptions.rb:63:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/show_exceptions.rb:31:in `call'
+railties (5.1.4) lib/rails/rack/logger.rb:36:in `call_app'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `block in call'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `block in tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:26:in `tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `tagged'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/remote_ip.rb:79:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/request_id.rb:25:in `call'
+rack (2.0.3) lib/rack/runtime.rb:22:in `call'
+activesupport (5.1.4) lib/active_support/cache/strategy/local_cache_middleware.rb:27:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/executor.rb:12:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/static.rb:125:in `call'
+rack (2.0.3) lib/rack/sendfile.rb:111:in `call'
+railties (5.1.4) lib/rails/engine.rb:522:in `call'
+puma (3.10.0) lib/puma/configuration.rb:225:in `call'
+puma (3.10.0) lib/puma/server.rb:605:in `handle_request'
+puma (3.10.0) lib/puma/server.rb:437:in `process_client'
+puma (3.10.0) lib/puma/server.rb:301:in `block in run'
+puma (3.10.0) lib/puma/thread_pool.rb:120:in `block in spawn_thread'
+Started GET "/notifications/push" for 127.0.0.1 at 2017-09-21 00:09:30 -0500
+Processing by NotificationsController#show as HTML
+  Parameters: {"id"=>"push"}
+  [1m[36mNotification Load (0.5ms)[0m  [1m[34mSELECT  "notifications".* FROM "notifications" WHERE "notifications"."id" = $1 LIMIT $2[0m  [["id", 0], ["LIMIT", 1]]
+Completed 404 Not Found in 34ms (ActiveRecord: 5.0ms)
+
+
+  
+ActiveRecord::RecordNotFound (Couldn't find Notification with 'id'=push):
+  
+app/controllers/notifications_controller.rb:64:in `set_notification'
+Started GET "/serviceworker.js" for 127.0.0.1 at 2017-09-21 00:09:31 -0500
+  
+ActionController::RoutingError (No route matches [GET] "/serviceworker.js"):
+  
+actionpack (5.1.4) lib/action_dispatch/middleware/debug_exceptions.rb:63:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/show_exceptions.rb:31:in `call'
+railties (5.1.4) lib/rails/rack/logger.rb:36:in `call_app'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `block in call'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `block in tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:26:in `tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `tagged'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/remote_ip.rb:79:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/request_id.rb:25:in `call'
+rack (2.0.3) lib/rack/runtime.rb:22:in `call'
+activesupport (5.1.4) lib/active_support/cache/strategy/local_cache_middleware.rb:27:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/executor.rb:12:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/static.rb:125:in `call'
+rack (2.0.3) lib/rack/sendfile.rb:111:in `call'
+railties (5.1.4) lib/rails/engine.rb:522:in `call'
+puma (3.10.0) lib/puma/configuration.rb:225:in `call'
+puma (3.10.0) lib/puma/server.rb:605:in `handle_request'
+puma (3.10.0) lib/puma/server.rb:437:in `process_client'
+puma (3.10.0) lib/puma/server.rb:301:in `block in run'
+puma (3.10.0) lib/puma/thread_pool.rb:120:in `block in spawn_thread'
+Started GET "/notifications/push" for 127.0.0.1 at 2017-09-21 00:09:50 -0500
+Processing by NotificationsController#show as HTML
+  Parameters: {"id"=>"push"}
+  [1m[36mNotification Load (0.2ms)[0m  [1m[34mSELECT  "notifications".* FROM "notifications" WHERE "notifications"."id" = $1 LIMIT $2[0m  [["id", 0], ["LIMIT", 1]]
+Completed 404 Not Found in 8ms (ActiveRecord: 2.9ms)
+
+
+  
+ActiveRecord::RecordNotFound (Couldn't find Notification with 'id'=push):
+  
+app/controllers/notifications_controller.rb:64:in `set_notification'
+Started GET "/serviceworker.js" for 127.0.0.1 at 2017-09-21 00:09:51 -0500
+  
+ActionController::RoutingError (No route matches [GET] "/serviceworker.js"):
+  
+actionpack (5.1.4) lib/action_dispatch/middleware/debug_exceptions.rb:63:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/show_exceptions.rb:31:in `call'
+railties (5.1.4) lib/rails/rack/logger.rb:36:in `call_app'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `block in call'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `block in tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:26:in `tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `tagged'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/remote_ip.rb:79:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/request_id.rb:25:in `call'
+rack (2.0.3) lib/rack/runtime.rb:22:in `call'
+activesupport (5.1.4) lib/active_support/cache/strategy/local_cache_middleware.rb:27:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/executor.rb:12:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/static.rb:125:in `call'
+rack (2.0.3) lib/rack/sendfile.rb:111:in `call'
+railties (5.1.4) lib/rails/engine.rb:522:in `call'
+puma (3.10.0) lib/puma/configuration.rb:225:in `call'
+puma (3.10.0) lib/puma/server.rb:605:in `handle_request'
+puma (3.10.0) lib/puma/server.rb:437:in `process_client'
+puma (3.10.0) lib/puma/server.rb:301:in `block in run'
+puma (3.10.0) lib/puma/thread_pool.rb:120:in `block in spawn_thread'
+Started GET "/notifications/create_push" for 127.0.0.1 at 2017-09-21 00:09:55 -0500
+Processing by NotificationsController#show as HTML
+  Parameters: {"id"=>"create_push"}
+  [1m[36mNotification Load (0.2ms)[0m  [1m[34mSELECT  "notifications".* FROM "notifications" WHERE "notifications"."id" = $1 LIMIT $2[0m  [["id", 0], ["LIMIT", 1]]
+Completed 404 Not Found in 1ms (ActiveRecord: 0.2ms)
+
+
+  
+ActiveRecord::RecordNotFound (Couldn't find Notification with 'id'=create_push):
+  
+app/controllers/notifications_controller.rb:64:in `set_notification'
+Started GET "/serviceworker.js" for 127.0.0.1 at 2017-09-21 00:09:56 -0500
+  
+ActionController::RoutingError (No route matches [GET] "/serviceworker.js"):
+  
+actionpack (5.1.4) lib/action_dispatch/middleware/debug_exceptions.rb:63:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/show_exceptions.rb:31:in `call'
+railties (5.1.4) lib/rails/rack/logger.rb:36:in `call_app'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `block in call'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `block in tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:26:in `tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `tagged'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/remote_ip.rb:79:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/request_id.rb:25:in `call'
+rack (2.0.3) lib/rack/runtime.rb:22:in `call'
+activesupport (5.1.4) lib/active_support/cache/strategy/local_cache_middleware.rb:27:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/executor.rb:12:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/static.rb:125:in `call'
+rack (2.0.3) lib/rack/sendfile.rb:111:in `call'
+railties (5.1.4) lib/rails/engine.rb:522:in `call'
+puma (3.10.0) lib/puma/configuration.rb:225:in `call'
+puma (3.10.0) lib/puma/server.rb:605:in `handle_request'
+puma (3.10.0) lib/puma/server.rb:437:in `process_client'
+puma (3.10.0) lib/puma/server.rb:301:in `block in run'
+puma (3.10.0) lib/puma/thread_pool.rb:120:in `block in spawn_thread'
+Started GET "/notifications" for 127.0.0.1 at 2017-09-21 00:10:50 -0500
+Processing by NotificationsController#index as HTML
+  [1m[36mNotification Load (0.2ms)[0m  [1m[34mSELECT "notifications".* FROM "notifications"[0m
+Completed 200 OK in 1ms (Views: 0.7ms | ActiveRecord: 0.2ms)
+
+
+Started GET "/serviceworker.js" for 127.0.0.1 at 2017-09-21 00:10:52 -0500
+  
+ActionController::RoutingError (No route matches [GET] "/serviceworker.js"):
+  
+actionpack (5.1.4) lib/action_dispatch/middleware/debug_exceptions.rb:63:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/show_exceptions.rb:31:in `call'
+railties (5.1.4) lib/rails/rack/logger.rb:36:in `call_app'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `block in call'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `block in tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:26:in `tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `tagged'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/remote_ip.rb:79:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/request_id.rb:25:in `call'
+rack (2.0.3) lib/rack/runtime.rb:22:in `call'
+activesupport (5.1.4) lib/active_support/cache/strategy/local_cache_middleware.rb:27:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/executor.rb:12:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/static.rb:125:in `call'
+rack (2.0.3) lib/rack/sendfile.rb:111:in `call'
+railties (5.1.4) lib/rails/engine.rb:522:in `call'
+puma (3.10.0) lib/puma/configuration.rb:225:in `call'
+puma (3.10.0) lib/puma/server.rb:605:in `handle_request'
+puma (3.10.0) lib/puma/server.rb:437:in `process_client'
+puma (3.10.0) lib/puma/server.rb:301:in `block in run'
+puma (3.10.0) lib/puma/thread_pool.rb:120:in `block in spawn_thread'
+Started GET "/notifications/create" for 127.0.0.1 at 2017-09-21 00:10:55 -0500
+Processing by NotificationsController#show as HTML
+  Parameters: {"id"=>"create"}
+  [1m[36mNotification Load (0.2ms)[0m  [1m[34mSELECT  "notifications".* FROM "notifications" WHERE "notifications"."id" = $1 LIMIT $2[0m  [["id", 0], ["LIMIT", 1]]
+Completed 404 Not Found in 1ms (ActiveRecord: 0.2ms)
+
+
+  
+ActiveRecord::RecordNotFound (Couldn't find Notification with 'id'=create):
+  
+app/controllers/notifications_controller.rb:64:in `set_notification'
+Started GET "/serviceworker.js" for 127.0.0.1 at 2017-09-21 00:10:56 -0500
+  
+ActionController::RoutingError (No route matches [GET] "/serviceworker.js"):
+  
+actionpack (5.1.4) lib/action_dispatch/middleware/debug_exceptions.rb:63:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/show_exceptions.rb:31:in `call'
+railties (5.1.4) lib/rails/rack/logger.rb:36:in `call_app'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `block in call'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `block in tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:26:in `tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `tagged'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/remote_ip.rb:79:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/request_id.rb:25:in `call'
+rack (2.0.3) lib/rack/runtime.rb:22:in `call'
+activesupport (5.1.4) lib/active_support/cache/strategy/local_cache_middleware.rb:27:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/executor.rb:12:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/static.rb:125:in `call'
+rack (2.0.3) lib/rack/sendfile.rb:111:in `call'
+railties (5.1.4) lib/rails/engine.rb:522:in `call'
+puma (3.10.0) lib/puma/configuration.rb:225:in `call'
+puma (3.10.0) lib/puma/server.rb:605:in `handle_request'
+puma (3.10.0) lib/puma/server.rb:437:in `process_client'
+puma (3.10.0) lib/puma/server.rb:301:in `block in run'
+puma (3.10.0) lib/puma/thread_pool.rb:120:in `block in spawn_thread'
+Started GET "/notifications/create_push" for 127.0.0.1 at 2017-09-21 00:10:59 -0500
+Processing by NotificationsController#show as HTML
+  Parameters: {"id"=>"create_push"}
+  [1m[36mNotification Load (0.2ms)[0m  [1m[34mSELECT  "notifications".* FROM "notifications" WHERE "notifications"."id" = $1 LIMIT $2[0m  [["id", 0], ["LIMIT", 1]]
+Completed 404 Not Found in 1ms (ActiveRecord: 0.2ms)
+
+
+  
+ActiveRecord::RecordNotFound (Couldn't find Notification with 'id'=create_push):
+  
+app/controllers/notifications_controller.rb:64:in `set_notification'
+Started GET "/serviceworker.js" for 127.0.0.1 at 2017-09-21 00:11:00 -0500
+  
+ActionController::RoutingError (No route matches [GET] "/serviceworker.js"):
+  
+actionpack (5.1.4) lib/action_dispatch/middleware/debug_exceptions.rb:63:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/show_exceptions.rb:31:in `call'
+railties (5.1.4) lib/rails/rack/logger.rb:36:in `call_app'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `block in call'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `block in tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:26:in `tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `tagged'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/remote_ip.rb:79:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/request_id.rb:25:in `call'
+rack (2.0.3) lib/rack/runtime.rb:22:in `call'
+activesupport (5.1.4) lib/active_support/cache/strategy/local_cache_middleware.rb:27:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/executor.rb:12:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/static.rb:125:in `call'
+rack (2.0.3) lib/rack/sendfile.rb:111:in `call'
+railties (5.1.4) lib/rails/engine.rb:522:in `call'
+puma (3.10.0) lib/puma/configuration.rb:225:in `call'
+puma (3.10.0) lib/puma/server.rb:605:in `handle_request'
+puma (3.10.0) lib/puma/server.rb:437:in `process_client'
+puma (3.10.0) lib/puma/server.rb:301:in `block in run'
+puma (3.10.0) lib/puma/thread_pool.rb:120:in `block in spawn_thread'
+Started GET "/notifications/create_push" for 127.0.0.1 at 2017-09-21 00:12:02 -0500
+Processing by NotificationsController#create_push as HTML
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mRpush::Client::ActiveRecord::App Exists (0.5ms)[0m  [1m[34mSELECT  1 AS one FROM "rpush_apps" WHERE "rpush_apps"."name" = $1 AND "rpush_apps"."type" = $2 AND "rpush_apps"."environment" IS NULL LIMIT $3[0m  [["name", "android_app"], ["type", "Rpush::Client::ActiveRecord::Gcm::App"], ["LIMIT", 1]]
+  [1m[35mSQL (0.4ms)[0m  [1m[32mINSERT INTO "rpush_apps" ("name", "created_at", "updated_at", "type", "auth_key") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["name", "android_app"], ["created_at", "2017-09-21 05:12:02.717889"], ["updated_at", "2017-09-21 05:12:02.717889"], ["type", "Rpush::Client::ActiveRecord::Gcm::App"], ["auth_key", "..."]]
+  [1m[35m (21.0ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mRpush::Client::ActiveRecord::Gcm::App Load (0.4ms)[0m  [1m[34mSELECT  "rpush_apps".* FROM "rpush_apps" WHERE "rpush_apps"."type" IN ('Rpush::Client::ActiveRecord::Gcm::App') AND "rpush_apps"."name" = $1 LIMIT $2[0m  [["name", "android_app"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.5ms)[0m  [1m[32mINSERT INTO "rpush_notifications" ("data", "created_at", "updated_at", "type", "registration_ids", "app_id", "priority", "content_available", "notification") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING "id"[0m  [["data", "{\"message\":\"hi mom!\"}"], ["created_at", "2017-09-21 05:12:02.873654"], ["updated_at", "2017-09-21 05:12:02.873654"], ["type", "Rpush::Client::ActiveRecord::Gcm::Notification"], ["registration_ids", "---\n- \"...\"\n"], ["app_id", 1], ["priority", 10], ["content_available", "t"], ["notification", "{\"body\":\"great match!\",\"title\":\"Portugal vs. Denmark\",\"icon\":\"myicon\",\"message\":\"hi mom!\"}"]]
+  [1m[35m (20.5ms)[0m  [1m[35mCOMMIT[0m
+Completed 204 No Content in 229ms (ActiveRecord: 49.4ms)
+
+
+Started GET "/serviceworker.js" for 127.0.0.1 at 2017-09-21 00:12:03 -0500
+  
+ActionController::RoutingError (No route matches [GET] "/serviceworker.js"):
+  
+actionpack (5.1.4) lib/action_dispatch/middleware/debug_exceptions.rb:63:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/show_exceptions.rb:31:in `call'
+railties (5.1.4) lib/rails/rack/logger.rb:36:in `call_app'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `block in call'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `block in tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:26:in `tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `tagged'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/remote_ip.rb:79:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/request_id.rb:25:in `call'
+rack (2.0.3) lib/rack/runtime.rb:22:in `call'
+activesupport (5.1.4) lib/active_support/cache/strategy/local_cache_middleware.rb:27:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/executor.rb:12:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/static.rb:125:in `call'
+rack (2.0.3) lib/rack/sendfile.rb:111:in `call'
+railties (5.1.4) lib/rails/engine.rb:522:in `call'
+puma (3.10.0) lib/puma/configuration.rb:225:in `call'
+puma (3.10.0) lib/puma/server.rb:605:in `handle_request'
+puma (3.10.0) lib/puma/server.rb:437:in `process_client'
+puma (3.10.0) lib/puma/server.rb:301:in `block in run'
+puma (3.10.0) lib/puma/thread_pool.rb:120:in `block in spawn_thread'
+Started GET "/notifications/create_push" for 127.0.0.1 at 2017-09-21 00:12:04 -0500
+Processing by NotificationsController#create_push as HTML
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mRpush::Client::ActiveRecord::App Exists (0.3ms)[0m  [1m[34mSELECT  1 AS one FROM "rpush_apps" WHERE "rpush_apps"."name" = $1 AND "rpush_apps"."type" = $2 AND "rpush_apps"."environment" IS NULL LIMIT $3[0m  [["name", "android_app"], ["type", "Rpush::Client::ActiveRecord::Gcm::App"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+Completed 422 Unprocessable Entity in 48ms (ActiveRecord: 0.6ms)
+
+
+  
+ActiveRecord::RecordInvalid (Validation failed: Name has already been taken):
+  
+app/controllers/notifications_controller.rb:32:in `create_push'
+Started GET "/serviceworker.js" for 127.0.0.1 at 2017-09-21 00:12:05 -0500
+  
+ActionController::RoutingError (No route matches [GET] "/serviceworker.js"):
+  
+actionpack (5.1.4) lib/action_dispatch/middleware/debug_exceptions.rb:63:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/show_exceptions.rb:31:in `call'
+railties (5.1.4) lib/rails/rack/logger.rb:36:in `call_app'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `block in call'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `block in tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:26:in `tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `tagged'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/remote_ip.rb:79:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/request_id.rb:25:in `call'
+rack (2.0.3) lib/rack/runtime.rb:22:in `call'
+activesupport (5.1.4) lib/active_support/cache/strategy/local_cache_middleware.rb:27:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/executor.rb:12:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/static.rb:125:in `call'
+rack (2.0.3) lib/rack/sendfile.rb:111:in `call'
+railties (5.1.4) lib/rails/engine.rb:522:in `call'
+puma (3.10.0) lib/puma/configuration.rb:225:in `call'
+puma (3.10.0) lib/puma/server.rb:605:in `handle_request'
+puma (3.10.0) lib/puma/server.rb:437:in `process_client'
+puma (3.10.0) lib/puma/server.rb:301:in `block in run'
+puma (3.10.0) lib/puma/thread_pool.rb:120:in `block in spawn_thread'
+Started GET "/serviceworker.js" for 127.0.0.1 at 2017-09-21 00:16:07 -0500
+  [1m[35m (0.5ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  
+ActionController::RoutingError (No route matches [GET] "/serviceworker.js"):
+  
+actionpack (5.1.4) lib/action_dispatch/middleware/debug_exceptions.rb:63:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/show_exceptions.rb:31:in `call'
+railties (5.1.4) lib/rails/rack/logger.rb:36:in `call_app'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `block in call'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `block in tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:26:in `tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `tagged'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/remote_ip.rb:79:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/request_id.rb:25:in `call'
+rack (2.0.3) lib/rack/runtime.rb:22:in `call'
+activesupport (5.1.4) lib/active_support/cache/strategy/local_cache_middleware.rb:27:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/executor.rb:12:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/static.rb:125:in `call'
+rack (2.0.3) lib/rack/sendfile.rb:111:in `call'
+railties (5.1.4) lib/rails/engine.rb:522:in `call'
+puma (3.10.0) lib/puma/configuration.rb:225:in `call'
+puma (3.10.0) lib/puma/server.rb:605:in `handle_request'
+puma (3.10.0) lib/puma/server.rb:437:in `process_client'
+puma (3.10.0) lib/puma/server.rb:301:in `block in run'
+puma (3.10.0) lib/puma/thread_pool.rb:120:in `block in spawn_thread'
+Started GET "/notifications/create_push" for 127.0.0.1 at 2017-09-21 00:16:09 -0500
+Processing by NotificationsController#create_push as HTML
+  [1m[36mRpush::Client::ActiveRecord::Gcm::App Load (0.9ms)[0m  [1m[34mSELECT  "rpush_apps".* FROM "rpush_apps" WHERE "rpush_apps"."type" IN ('Rpush::Client::ActiveRecord::Gcm::App') AND "rpush_apps"."name" = $1 LIMIT $2[0m  [["name", "android_app"], ["LIMIT", 1]]
+  [1m[36mCACHE Rpush::Client::ActiveRecord::Gcm::App Load (0.0ms)[0m  [1m[34mSELECT  "rpush_apps".* FROM "rpush_apps" WHERE "rpush_apps"."type" IN ('Rpush::Client::ActiveRecord::Gcm::App') AND "rpush_apps"."name" = $1 LIMIT $2[0m  [["name", "android_app"], ["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.5ms)[0m  [1m[32mINSERT INTO "rpush_notifications" ("data", "created_at", "updated_at", "type", "registration_ids", "app_id", "priority", "content_available", "notification") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING "id"[0m  [["data", "{\"message\":\"hi mom!\"}"], ["created_at", "2017-09-21 05:16:09.285437"], ["updated_at", "2017-09-21 05:16:09.285437"], ["type", "Rpush::Client::ActiveRecord::Gcm::Notification"], ["registration_ids", "---\n- \"...\"\n"], ["app_id", 1], ["priority", 10], ["content_available", "t"], ["notification", "{\"body\":\"great match!\",\"title\":\"Portugal vs. Denmark\",\"icon\":\"myicon\",\"message\":\"hi mom!\"}"]]
+  [1m[35m (20.9ms)[0m  [1m[35mCOMMIT[0m
+Completed 204 No Content in 127ms (ActiveRecord: 29.7ms)
+
+
+Started GET "/notifications/create_push" for 127.0.0.1 at 2017-09-21 00:16:10 -0500
+Processing by NotificationsController#create_push as HTML
+  [1m[36mRpush::Client::ActiveRecord::Gcm::App Load (0.2ms)[0m  [1m[34mSELECT  "rpush_apps".* FROM "rpush_apps" WHERE "rpush_apps"."type" IN ('Rpush::Client::ActiveRecord::Gcm::App') AND "rpush_apps"."name" = $1 LIMIT $2[0m  [["name", "android_app"], ["LIMIT", 1]]
+  [1m[36mCACHE Rpush::Client::ActiveRecord::Gcm::App Load (0.0ms)[0m  [1m[34mSELECT  "rpush_apps".* FROM "rpush_apps" WHERE "rpush_apps"."type" IN ('Rpush::Client::ActiveRecord::Gcm::App') AND "rpush_apps"."name" = $1 LIMIT $2[0m  [["name", "android_app"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.3ms)[0m  [1m[32mINSERT INTO "rpush_notifications" ("data", "created_at", "updated_at", "type", "registration_ids", "app_id", "priority", "content_available", "notification") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING "id"[0m  [["data", "{\"message\":\"hi mom!\"}"], ["created_at", "2017-09-21 05:16:10.207184"], ["updated_at", "2017-09-21 05:16:10.207184"], ["type", "Rpush::Client::ActiveRecord::Gcm::Notification"], ["registration_ids", "---\n- \"...\"\n"], ["app_id", 1], ["priority", 10], ["content_available", "t"], ["notification", "{\"body\":\"great match!\",\"title\":\"Portugal vs. Denmark\",\"icon\":\"myicon\",\"message\":\"hi mom!\"}"]]
+  [1m[35m (20.9ms)[0m  [1m[35mCOMMIT[0m
+Completed 204 No Content in 27ms (ActiveRecord: 21.7ms)
+
+
+Started GET "/serviceworker.js" for 127.0.0.1 at 2017-09-21 00:16:11 -0500
+  
+ActionController::RoutingError (No route matches [GET] "/serviceworker.js"):
+  
+actionpack (5.1.4) lib/action_dispatch/middleware/debug_exceptions.rb:63:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/show_exceptions.rb:31:in `call'
+railties (5.1.4) lib/rails/rack/logger.rb:36:in `call_app'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `block in call'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `block in tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:26:in `tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `tagged'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/remote_ip.rb:79:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/request_id.rb:25:in `call'
+rack (2.0.3) lib/rack/runtime.rb:22:in `call'
+activesupport (5.1.4) lib/active_support/cache/strategy/local_cache_middleware.rb:27:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/executor.rb:12:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/static.rb:125:in `call'
+rack (2.0.3) lib/rack/sendfile.rb:111:in `call'
+railties (5.1.4) lib/rails/engine.rb:522:in `call'
+puma (3.10.0) lib/puma/configuration.rb:225:in `call'
+puma (3.10.0) lib/puma/server.rb:605:in `handle_request'
+puma (3.10.0) lib/puma/server.rb:437:in `process_client'
+puma (3.10.0) lib/puma/server.rb:301:in `block in run'
+puma (3.10.0) lib/puma/thread_pool.rb:120:in `block in spawn_thread'
+Started GET "/notifications" for 127.0.0.1 at 2017-09-21 00:16:13 -0500
+  
+ActionController::RoutingError (No route matches [GET] "/notifications"):
+  
+actionpack (5.1.4) lib/action_dispatch/middleware/debug_exceptions.rb:63:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/show_exceptions.rb:31:in `call'
+railties (5.1.4) lib/rails/rack/logger.rb:36:in `call_app'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `block in call'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `block in tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:26:in `tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `tagged'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/remote_ip.rb:79:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/request_id.rb:25:in `call'
+rack (2.0.3) lib/rack/runtime.rb:22:in `call'
+activesupport (5.1.4) lib/active_support/cache/strategy/local_cache_middleware.rb:27:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/executor.rb:12:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/static.rb:125:in `call'
+rack (2.0.3) lib/rack/sendfile.rb:111:in `call'
+railties (5.1.4) lib/rails/engine.rb:522:in `call'
+puma (3.10.0) lib/puma/configuration.rb:225:in `call'
+puma (3.10.0) lib/puma/server.rb:605:in `handle_request'
+puma (3.10.0) lib/puma/server.rb:437:in `process_client'
+puma (3.10.0) lib/puma/server.rb:301:in `block in run'
+puma (3.10.0) lib/puma/thread_pool.rb:120:in `block in spawn_thread'
+Started GET "/serviceworker.js" for 127.0.0.1 at 2017-09-21 00:16:14 -0500
+  
+ActionController::RoutingError (No route matches [GET] "/serviceworker.js"):
+  
+actionpack (5.1.4) lib/action_dispatch/middleware/debug_exceptions.rb:63:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/show_exceptions.rb:31:in `call'
+railties (5.1.4) lib/rails/rack/logger.rb:36:in `call_app'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `block in call'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `block in tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:26:in `tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `tagged'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/remote_ip.rb:79:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/request_id.rb:25:in `call'
+rack (2.0.3) lib/rack/runtime.rb:22:in `call'
+activesupport (5.1.4) lib/active_support/cache/strategy/local_cache_middleware.rb:27:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/executor.rb:12:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/static.rb:125:in `call'
+rack (2.0.3) lib/rack/sendfile.rb:111:in `call'
+railties (5.1.4) lib/rails/engine.rb:522:in `call'
+puma (3.10.0) lib/puma/configuration.rb:225:in `call'
+puma (3.10.0) lib/puma/server.rb:605:in `handle_request'
+puma (3.10.0) lib/puma/server.rb:437:in `process_client'
+puma (3.10.0) lib/puma/server.rb:301:in `block in run'
+puma (3.10.0) lib/puma/thread_pool.rb:120:in `block in spawn_thread'
+Started GET "/notifications/create_push" for 127.0.0.1 at 2017-09-21 00:16:22 -0500
+Processing by NotificationsController#create_push as HTML
+  [1m[36mRpush::Client::ActiveRecord::Gcm::App Load (0.2ms)[0m  [1m[34mSELECT  "rpush_apps".* FROM "rpush_apps" WHERE "rpush_apps"."type" IN ('Rpush::Client::ActiveRecord::Gcm::App') AND "rpush_apps"."name" = $1 LIMIT $2[0m  [["name", "android_app"], ["LIMIT", 1]]
+  [1m[36mCACHE Rpush::Client::ActiveRecord::Gcm::App Load (0.0ms)[0m  [1m[34mSELECT  "rpush_apps".* FROM "rpush_apps" WHERE "rpush_apps"."type" IN ('Rpush::Client::ActiveRecord::Gcm::App') AND "rpush_apps"."name" = $1 LIMIT $2[0m  [["name", "android_app"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.3ms)[0m  [1m[32mINSERT INTO "rpush_notifications" ("data", "created_at", "updated_at", "type", "registration_ids", "app_id", "priority", "content_available", "notification") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING "id"[0m  [["data", "{\"message\":\"hi mom!\"}"], ["created_at", "2017-09-21 05:16:22.762807"], ["updated_at", "2017-09-21 05:16:22.762807"], ["type", "Rpush::Client::ActiveRecord::Gcm::Notification"], ["registration_ids", "---\n- \"...\"\n"], ["app_id", 1], ["priority", 10], ["content_available", "t"], ["notification", "{\"body\":\"great match!\",\"title\":\"Portugal vs. Denmark\",\"icon\":\"myicon\",\"message\":\"hi mom!\"}"]]
+  [1m[35m (58.0ms)[0m  [1m[35mCOMMIT[0m
+Completed 204 No Content in 63ms (ActiveRecord: 58.6ms)
+
+
+Started GET "/serviceworker.js" for 127.0.0.1 at 2017-09-21 00:16:23 -0500
+  
+ActionController::RoutingError (No route matches [GET] "/serviceworker.js"):
+  
+actionpack (5.1.4) lib/action_dispatch/middleware/debug_exceptions.rb:63:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/show_exceptions.rb:31:in `call'
+railties (5.1.4) lib/rails/rack/logger.rb:36:in `call_app'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `block in call'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `block in tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:26:in `tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `tagged'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/remote_ip.rb:79:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/request_id.rb:25:in `call'
+rack (2.0.3) lib/rack/runtime.rb:22:in `call'
+activesupport (5.1.4) lib/active_support/cache/strategy/local_cache_middleware.rb:27:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/executor.rb:12:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/static.rb:125:in `call'
+rack (2.0.3) lib/rack/sendfile.rb:111:in `call'
+railties (5.1.4) lib/rails/engine.rb:522:in `call'
+puma (3.10.0) lib/puma/configuration.rb:225:in `call'
+puma (3.10.0) lib/puma/server.rb:605:in `handle_request'
+puma (3.10.0) lib/puma/server.rb:437:in `process_client'
+puma (3.10.0) lib/puma/server.rb:301:in `block in run'
+puma (3.10.0) lib/puma/thread_pool.rb:120:in `block in spawn_thread'
+  [1m[35m (0.6ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT pg_try_advisory_lock(6931697059447046565)[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to CreateNotifications (20170921050541)
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (1.1ms)[0m  [1m[35mDROP TABLE "notifications"[0m
+  [1m[35mSQL (0.3ms)[0m  [1m[31mDELETE FROM "schema_migrations" WHERE "schema_migrations"."version" = $1[0m  [["version", "20170921050541"]]
+  [1m[35m (23.1ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT pg_advisory_unlock(6931697059447046565)[0m
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT pg_try_advisory_lock(6931697059447046565)[0m
+  [1m[35m (0.4ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to CreateUserDevices (20170921051911)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (92.6ms)[0m  [1m[35mCREATE TABLE "user_devices" ("id" bigserial primary key, "username" character varying, "device_id" character varying, "created_at" timestamp NOT NULL, "updated_at" timestamp NOT NULL)[0m
+  [1m[35mSQL (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20170921051911"]]
+  [1m[35m (17.1ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.3ms)[0m  [1m[34mSELECT  "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1 LIMIT $2[0m  [["key", "environment"], ["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT pg_advisory_unlock(6931697059447046565)[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT pg_try_advisory_lock(6931697059447046565)[0m
+  [1m[35m (0.5ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.3ms)[0m  [1m[34mSELECT  "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1 LIMIT $2[0m  [["key", "environment"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT pg_advisory_unlock(6931697059447046565)[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Started GET "/notifications" for 127.0.0.1 at 2017-09-21 00:25:23 -0500
+  [1m[35m (0.8ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  
+ActionController::RoutingError (No route matches [GET] "/notifications"):
+  
+actionpack (5.1.4) lib/action_dispatch/middleware/debug_exceptions.rb:63:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/show_exceptions.rb:31:in `call'
+railties (5.1.4) lib/rails/rack/logger.rb:36:in `call_app'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `block in call'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `block in tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:26:in `tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `tagged'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/remote_ip.rb:79:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/request_id.rb:25:in `call'
+rack (2.0.3) lib/rack/runtime.rb:22:in `call'
+activesupport (5.1.4) lib/active_support/cache/strategy/local_cache_middleware.rb:27:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/executor.rb:12:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/static.rb:125:in `call'
+rack (2.0.3) lib/rack/sendfile.rb:111:in `call'
+railties (5.1.4) lib/rails/engine.rb:522:in `call'
+puma (3.10.0) lib/puma/configuration.rb:225:in `call'
+puma (3.10.0) lib/puma/server.rb:605:in `handle_request'
+puma (3.10.0) lib/puma/server.rb:437:in `process_client'
+puma (3.10.0) lib/puma/server.rb:301:in `block in run'
+puma (3.10.0) lib/puma/thread_pool.rb:120:in `block in spawn_thread'
+Started GET "/serviceworker.js" for 127.0.0.1 at 2017-09-21 00:25:24 -0500
+  
+ActionController::RoutingError (No route matches [GET] "/serviceworker.js"):
+  
+actionpack (5.1.4) lib/action_dispatch/middleware/debug_exceptions.rb:63:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/show_exceptions.rb:31:in `call'
+railties (5.1.4) lib/rails/rack/logger.rb:36:in `call_app'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `block in call'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `block in tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:26:in `tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `tagged'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/remote_ip.rb:79:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/request_id.rb:25:in `call'
+rack (2.0.3) lib/rack/runtime.rb:22:in `call'
+activesupport (5.1.4) lib/active_support/cache/strategy/local_cache_middleware.rb:27:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/executor.rb:12:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/static.rb:125:in `call'
+rack (2.0.3) lib/rack/sendfile.rb:111:in `call'
+railties (5.1.4) lib/rails/engine.rb:522:in `call'
+puma (3.10.0) lib/puma/configuration.rb:225:in `call'
+puma (3.10.0) lib/puma/server.rb:605:in `handle_request'
+puma (3.10.0) lib/puma/server.rb:437:in `process_client'
+puma (3.10.0) lib/puma/server.rb:301:in `block in run'
+puma (3.10.0) lib/puma/thread_pool.rb:120:in `block in spawn_thread'
+  [1m[35m (0.5ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT pg_try_advisory_lock(6931697059447046565)[0m
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to CreateUserDevices (20170921051911)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.8ms)[0m  [1m[35mDROP TABLE "user_devices"[0m
+  [1m[35mSQL (0.4ms)[0m  [1m[31mDELETE FROM "schema_migrations" WHERE "schema_migrations"."version" = $1[0m  [["version", "20170921051911"]]
+  [1m[35m (35.8ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT pg_advisory_unlock(6931697059447046565)[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.5ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT pg_try_advisory_lock(6931697059447046565)[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to Rpush300Updates (20170921050239)
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.6ms)[0m  [1m[35mALTER TABLE "rpush_notifications" DROP "mutable_content"[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ALTER COLUMN "sound" TYPE character varying[0m
+  [1m[35m (0.4ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ALTER COLUMN "sound" SET DEFAULT 'default'[0m
+  [1m[35mSQL (0.5ms)[0m  [1m[31mDELETE FROM "schema_migrations" WHERE "schema_migrations"."version" = $1[0m  [["version", "20170921050239"]]
+  [1m[35m (40.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.4ms)[0m  [1m[34mSELECT pg_advisory_unlock(6931697059447046565)[0m
+  [1m[35m (0.4ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT pg_try_advisory_lock(6931697059447046565)[0m
+  [1m[35m (0.4ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to Rpush300Updates (20170921050239)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (141.9ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ADD "mutable_content" boolean DEFAULT 'f'[0m
+  [1m[35m (0.5ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ALTER COLUMN "sound" TYPE character varying[0m
+  [1m[35m (0.3ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ALTER COLUMN "sound" DROP DEFAULT[0m
+  [1m[35mSQL (0.3ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20170921050239"]]
+  [1m[35m (11.5ms)[0m  [1m[35mCOMMIT[0m
+Migrating to CreateUserDevices (20170921062910)
+  [1m[35m (0.3ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (68.4ms)[0m  [1m[35mCREATE TABLE "user_devices" ("id" bigserial primary key, "username" character varying, "device_id" character varying, "created_at" timestamp NOT NULL, "updated_at" timestamp NOT NULL)[0m
+  [1m[35mSQL (0.7ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20170921062910"]]
+  [1m[35m (15.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.6ms)[0m  [1m[34mSELECT  "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1 LIMIT $2[0m  [["key", "environment"], ["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT pg_advisory_unlock(6931697059447046565)[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Started GET "/user_devices" for 127.0.0.1 at 2017-09-21 01:32:37 -0500
+  [1m[35m (0.4ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Processing by UserDevicesController#index as HTML
+  [1m[36mUserDevice Load (0.4ms)[0m  [1m[34mSELECT "user_devices".* FROM "user_devices"[0m
+Completed 200 OK in 5ms (Views: 1.0ms | ActiveRecord: 1.4ms)
+
+
+Started GET "/favicon.ico" for 127.0.0.1 at 2017-09-21 01:32:37 -0500
+  
+ActionController::RoutingError (No route matches [GET] "/favicon.ico"):
+  
+actionpack (5.1.4) lib/action_dispatch/middleware/debug_exceptions.rb:63:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/show_exceptions.rb:31:in `call'
+railties (5.1.4) lib/rails/rack/logger.rb:36:in `call_app'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `block in call'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `block in tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:26:in `tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `tagged'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/remote_ip.rb:79:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/request_id.rb:25:in `call'
+rack (2.0.3) lib/rack/runtime.rb:22:in `call'
+activesupport (5.1.4) lib/active_support/cache/strategy/local_cache_middleware.rb:27:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/executor.rb:12:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/static.rb:125:in `call'
+rack (2.0.3) lib/rack/sendfile.rb:111:in `call'
+railties (5.1.4) lib/rails/engine.rb:522:in `call'
+puma (3.10.0) lib/puma/configuration.rb:225:in `call'
+puma (3.10.0) lib/puma/server.rb:605:in `handle_request'
+puma (3.10.0) lib/puma/server.rb:437:in `process_client'
+puma (3.10.0) lib/puma/server.rb:301:in `block in run'
+puma (3.10.0) lib/puma/thread_pool.rb:120:in `block in spawn_thread'
+Started GET "/serviceworker.js" for 127.0.0.1 at 2017-09-21 01:32:38 -0500
+  
+ActionController::RoutingError (No route matches [GET] "/serviceworker.js"):
+  
+actionpack (5.1.4) lib/action_dispatch/middleware/debug_exceptions.rb:63:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/show_exceptions.rb:31:in `call'
+railties (5.1.4) lib/rails/rack/logger.rb:36:in `call_app'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `block in call'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `block in tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:26:in `tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `tagged'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/remote_ip.rb:79:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/request_id.rb:25:in `call'
+rack (2.0.3) lib/rack/runtime.rb:22:in `call'
+activesupport (5.1.4) lib/active_support/cache/strategy/local_cache_middleware.rb:27:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/executor.rb:12:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/static.rb:125:in `call'
+rack (2.0.3) lib/rack/sendfile.rb:111:in `call'
+railties (5.1.4) lib/rails/engine.rb:522:in `call'
+puma (3.10.0) lib/puma/configuration.rb:225:in `call'
+puma (3.10.0) lib/puma/server.rb:605:in `handle_request'
+puma (3.10.0) lib/puma/server.rb:437:in `process_client'
+puma (3.10.0) lib/puma/server.rb:301:in `block in run'
+puma (3.10.0) lib/puma/thread_pool.rb:120:in `block in spawn_thread'
+Started GET "/user_devices/new" for 127.0.0.1 at 2017-09-21 01:32:41 -0500
+Processing by UserDevicesController#show as HTML
+  Parameters: {"id"=>"new"}
+  [1m[36mUserDevice Load (0.2ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 0], ["LIMIT", 1]]
+Completed 404 Not Found in 6ms (ActiveRecord: 2.2ms)
+
+
+  
+ActiveRecord::RecordNotFound (Couldn't find UserDevice with 'id'=new):
+  
+app/controllers/user_devices_controller.rb:59:in `set_user_device'
+Started GET "/serviceworker.js" for 127.0.0.1 at 2017-09-21 01:32:42 -0500
+  
+ActionController::RoutingError (No route matches [GET] "/serviceworker.js"):
+  
+actionpack (5.1.4) lib/action_dispatch/middleware/debug_exceptions.rb:63:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/show_exceptions.rb:31:in `call'
+railties (5.1.4) lib/rails/rack/logger.rb:36:in `call_app'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `block in call'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `block in tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:26:in `tagged'
+activesupport (5.1.4) lib/active_support/tagged_logging.rb:69:in `tagged'
+railties (5.1.4) lib/rails/rack/logger.rb:24:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/remote_ip.rb:79:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/request_id.rb:25:in `call'
+rack (2.0.3) lib/rack/runtime.rb:22:in `call'
+activesupport (5.1.4) lib/active_support/cache/strategy/local_cache_middleware.rb:27:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/executor.rb:12:in `call'
+actionpack (5.1.4) lib/action_dispatch/middleware/static.rb:125:in `call'
+rack (2.0.3) lib/rack/sendfile.rb:111:in `call'
+railties (5.1.4) lib/rails/engine.rb:522:in `call'
+puma (3.10.0) lib/puma/configuration.rb:225:in `call'
+puma (3.10.0) lib/puma/server.rb:605:in `handle_request'
+puma (3.10.0) lib/puma/server.rb:437:in `process_client'
+puma (3.10.0) lib/puma/server.rb:301:in `block in run'
+puma (3.10.0) lib/puma/thread_pool.rb:120:in `block in spawn_thread'
+Started GET "/user_devices/" for 127.0.0.1 at 2017-09-21 01:33:22 -0500
+Processing by UserDevicesController#index as */*
+  [1m[36mUserDevice Load (0.3ms)[0m  [1m[34mSELECT "user_devices".* FROM "user_devices"[0m
+Completed 200 OK in 1ms (Views: 0.9ms | ActiveRecord: 0.3ms)
+
+
+Started POST "/user_devices/" for 127.0.0.1 at 2017-09-21 01:34:05 -0500
+Processing by UserDevicesController#create as */*
+  Parameters: {"username"=>"laWea", "device_id"=>"awdawd", "user_device"=>{"username"=>"laWea", "device_id"=>"awdawd"}}
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.6ms)[0m  [1m[32mINSERT INTO "user_devices" ("username", "device_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["username", "laWea"], ["device_id", "awdawd"], ["created_at", "2017-09-21 06:34:05.694500"], ["updated_at", "2017-09-21 06:34:05.694500"]]
+  [1m[35m (19.4ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mRpush::Client::ActiveRecord::Gcm::App Load (0.5ms)[0m  [1m[34mSELECT  "rpush_apps".* FROM "rpush_apps" WHERE "rpush_apps"."type" IN ('Rpush::Client::ActiveRecord::Gcm::App') AND "rpush_apps"."name" = $1 LIMIT $2[0m  [["name", "android-app"], ["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mRpush::Client::ActiveRecord::App Exists (0.4ms)[0m  [1m[34mSELECT  1 AS one FROM "rpush_apps" WHERE "rpush_apps"."name" = $1 AND "rpush_apps"."type" = $2 AND "rpush_apps"."environment" IS NULL LIMIT $3[0m  [["name", "android_app"], ["type", "Rpush::Client::ActiveRecord::Gcm::App"], ["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK[0m
+Completed 422 Unprocessable Entity in 65ms (Views: 1.5ms | ActiveRecord: 24.5ms)
+
+
+  
+ActiveRecord::RecordInvalid (Validation failed: Name has already been taken):
+  
+app/controllers/user_devices_controller.rb:27:in `create'
+Started POST "/user_devices/" for 127.0.0.1 at 2017-09-21 01:34:42 -0500
+Processing by UserDevicesController#create as */*
+  Parameters: {"username"=>"laWea", "device_id"=>"awdawd", "user_device"=>{"username"=>"laWea", "device_id"=>"awdawd"}}
+  [1m[36mRpush::Client::ActiveRecord::Gcm::App Load (0.4ms)[0m  [1m[34mSELECT  "rpush_apps".* FROM "rpush_apps" WHERE "rpush_apps"."type" IN ('Rpush::Client::ActiveRecord::Gcm::App') AND "rpush_apps"."name" = $1 LIMIT $2[0m  [["name", "android-app"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mRpush::Client::ActiveRecord::App Exists (0.2ms)[0m  [1m[34mSELECT  1 AS one FROM "rpush_apps" WHERE "rpush_apps"."name" = $1 AND "rpush_apps"."type" = $2 AND "rpush_apps"."environment" IS NULL LIMIT $3[0m  [["name", "android_app"], ["type", "Rpush::Client::ActiveRecord::Gcm::App"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+Completed 422 Unprocessable Entity in 14ms (ActiveRecord: 4.0ms)
+
+
+  
+ActiveRecord::RecordInvalid (Validation failed: Name has already been taken):
+  
+app/controllers/user_devices_controller.rb:24:in `create'
+Started POST "/user_devices/" for 127.0.0.1 at 2017-09-21 01:36:33 -0500
+  [1m[36mRpush::Client::ActiveRecord::Gcm::App Load (0.3ms)[0m  [1m[34mSELECT  "rpush_apps".* FROM "rpush_apps" WHERE "rpush_apps"."type" IN ('Rpush::Client::ActiveRecord::Gcm::App') AND "rpush_apps"."name" = $1 LIMIT $2[0m  [["name", "android-app"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mRpush::Client::ActiveRecord::App Exists (0.3ms)[0m  [1m[34mSELECT  1 AS one FROM "rpush_apps" WHERE "rpush_apps"."name" = $1 AND "rpush_apps"."type" = $2 AND "rpush_apps"."environment" IS NULL LIMIT $3[0m  [["name", "android_app"], ["type", "Rpush::Client::ActiveRecord::Gcm::App"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+  
+ActiveRecord::RecordInvalid (Validation failed: Name has already been taken):
+  
+app/controllers/application_controller.rb:7:in `<class:ApplicationController>'
+app/controllers/application_controller.rb:1:in `<top (required)>'
+app/controllers/user_devices_controller.rb:1:in `<top (required)>'
+Started POST "/user_devices/" for 127.0.0.1 at 2017-09-21 01:38:32 -0500
+Processing by UserDevicesController#create as */*
+  Parameters: {"username"=>"laWea", "device_id"=>"awdawd", "user_device"=>{"username"=>"laWea", "device_id"=>"awdawd"}}
+  [1m[36mRpush::Client::ActiveRecord::Gcm::App Load (0.7ms)[0m  [1m[34mSELECT  "rpush_apps".* FROM "rpush_apps" WHERE "rpush_apps"."type" IN ('Rpush::Client::ActiveRecord::Gcm::App') AND "rpush_apps"."name" = $1 LIMIT $2[0m  [["name", "android-app"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mRpush::Client::ActiveRecord::App Exists (0.5ms)[0m  [1m[34mSELECT  1 AS one FROM "rpush_apps" WHERE "rpush_apps"."name" = $1 AND "rpush_apps"."type" = $2 AND "rpush_apps"."environment" IS NULL LIMIT $3[0m  [["name", "android_app"], ["type", "Rpush::Client::ActiveRecord::Gcm::App"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[31mROLLBACK[0m
+Completed 422 Unprocessable Entity in 12ms (ActiveRecord: 4.2ms)
+
+
+  
+ActiveRecord::RecordInvalid (Validation failed: Name has already been taken):
+  
+app/controllers/user_devices_controller.rb:24:in `create'
+Started POST "/user_devices/" for 127.0.0.1 at 2017-09-21 01:38:39 -0500
+Processing by UserDevicesController#create as */*
+  Parameters: {"username"=>"laWea", "device_id"=>"awdawd", "user_device"=>{"username"=>"laWea", "device_id"=>"awdawd"}}
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.2ms)[0m  [1m[32mINSERT INTO "user_devices" ("username", "device_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["username", "laWea"], ["device_id", "awdawd"], ["created_at", "2017-09-21 06:38:39.995649"], ["updated_at", "2017-09-21 06:38:39.995649"]]
+  [1m[35m (11.8ms)[0m  [1m[35mCOMMIT[0m
+Completed 201 Created in 21ms (Views: 1.0ms | ActiveRecord: 14.8ms)
+
+
+Started GET "/user_devices/" for 127.0.0.1 at 2017-09-21 01:38:45 -0500
+Processing by UserDevicesController#index as */*
+  Parameters: {"user_device"=>{}}
+  [1m[36mUserDevice Load (0.2ms)[0m  [1m[34mSELECT "user_devices".* FROM "user_devices"[0m
+Completed 200 OK in 4ms (Views: 3.3ms | ActiveRecord: 0.2ms)
+
+
+Started POST "/user_devices/" for 127.0.0.1 at 2017-09-21 01:42:23 -0500
+Processing by UserDevicesController#create as */*
+  Parameters: {"username"=>"laWe2a", "device_id"=>"awdawd", "user_device"=>{"username"=>"laWe2a", "device_id"=>"awdawd"}}
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.3ms)[0m  [1m[32mINSERT INTO "user_devices" ("username", "device_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["username", "laWe2a"], ["device_id", "awdawd"], ["created_at", "2017-09-21 06:42:23.266486"], ["updated_at", "2017-09-21 06:42:23.266486"]]
+  [1m[35m (53.9ms)[0m  [1m[35mCOMMIT[0m
+Completed 500 Internal Server Error in 68ms (ActiveRecord: 57.3ms)
+
+
+  
+NameError (uninitialized constant UserDevicesController::Notification):
+  
+app/controllers/user_devices_controller.rb:20:in `create'
+Started POST "/user_devices/" for 127.0.0.1 at 2017-09-21 01:44:19 -0500
+Processing by UserDevicesController#create as */*
+  Parameters: {"username"=>"laWe2a", "device_id"=>"awdawd", "user_device"=>{"username"=>"laWe2a", "device_id"=>"awdawd"}}
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.7ms)[0m  [1m[32mINSERT INTO "user_devices" ("username", "device_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["username", "laWe2a"], ["device_id", "awdawd"], ["created_at", "2017-09-21 06:44:19.044372"], ["updated_at", "2017-09-21 06:44:19.044372"]]
+  [1m[35m (15.1ms)[0m  [1m[35mCOMMIT[0m
+Completed 500 Internal Server Error in 23ms (ActiveRecord: 18.5ms)
+
+
+  
+NameError (uninitialized constant UserDevicesController::Notification):
+  
+app/controllers/user_devices_controller.rb:20:in `create'
+Started GET "/user_devices/" for 127.0.0.1 at 2017-09-21 01:44:27 -0500
+Processing by UserDevicesController#index as */*
+  Parameters: {"user_device"=>{}}
+  [1m[36mUserDevice Load (0.2ms)[0m  [1m[34mSELECT "user_devices".* FROM "user_devices"[0m
+Completed 200 OK in 2ms (Views: 1.6ms | ActiveRecord: 0.2ms)
+
+
+Started POST "/user_devices/" for 127.0.0.1 at 2017-09-21 01:47:33 -0500
+Processing by UserDevicesController#create as */*
+  Parameters: {"username"=>"laWe2a", "device_id"=>"awdawd", "user_device"=>{"username"=>"laWe2a", "device_id"=>"awdawd"}}
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.3ms)[0m  [1m[32mINSERT INTO "user_devices" ("username", "device_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["username", "laWe2a"], ["device_id", "awdawd"], ["created_at", "2017-09-21 06:47:33.207314"], ["updated_at", "2017-09-21 06:47:33.207314"]]
+  [1m[35m (20.7ms)[0m  [1m[35mCOMMIT[0m
+Completed 500 Internal Server Error in 29ms (ActiveRecord: 25.3ms)
+
+
+  
+NameError (uninitialized constant UserDevicesController::Notification):
+  
+app/controllers/user_devices_controller.rb:21:in `create'
+Started POST "/user_devices/" for 127.0.0.1 at 2017-09-21 01:48:17 -0500
+Processing by UserDevicesController#create as */*
+  Parameters: {"username"=>"laWe2a", "device_id"=>"awdawd", "user_device"=>{"username"=>"laWe2a", "device_id"=>"awdawd"}}
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.4ms)[0m  [1m[32mINSERT INTO "user_devices" ("username", "device_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["username", "laWe2a"], ["device_id", "awdawd"], ["created_at", "2017-09-21 06:48:17.814601"], ["updated_at", "2017-09-21 06:48:17.814601"]]
+  [1m[35m (24.1ms)[0m  [1m[35mCOMMIT[0m
+Completed 500 Internal Server Error in 35ms (ActiveRecord: 27.5ms)
+
+
+  
+NameError (uninitialized constant UserDevicesController::Notification):
+  
+app/controllers/user_devices_controller.rb:21:in `create'
+Started POST "/user_devices/" for 127.0.0.1 at 2017-09-21 01:50:13 -0500
+Processing by UserDevicesController#create as */*
+  Parameters: {"username"=>"laWe2a", "device_id"=>"awdawd", "user_device"=>{"username"=>"laWe2a", "device_id"=>"awdawd"}}
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.3ms)[0m  [1m[32mINSERT INTO "user_devices" ("username", "device_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["username", "laWe2a"], ["device_id", "awdawd"], ["created_at", "2017-09-21 06:50:13.751603"], ["updated_at", "2017-09-21 06:50:13.751603"]]
+  [1m[35m (39.1ms)[0m  [1m[35mCOMMIT[0m
+Completed 500 Internal Server Error in 103ms (ActiveRecord: 42.6ms)
+
+
+  
+NameError (undefined local variable or method `custom_json' for #<UserDevicesController:0x0055ced2889608>):
+  
+app/controllers/user_devices_controller.rb:17:in `test'
+app/controllers/user_devices_controller.rb:29:in `create'
+Started POST "/user_devices/" for 127.0.0.1 at 2017-09-21 01:55:49 -0500
+Processing by UserDevicesController#create as */*
+  Parameters: {"username"=>"laWe2a", "device_id"=>"awdawd", "user_device"=>{"username"=>"laWe2a", "device_id"=>"awdawd"}}
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.3ms)[0m  [1m[32mINSERT INTO "user_devices" ("username", "device_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["username", "laWe2a"], ["device_id", "awdawd"], ["created_at", "2017-09-21 06:55:49.749786"], ["updated_at", "2017-09-21 06:55:49.749786"]]
+  [1m[35m (943.1ms)[0m  [1m[35mCOMMIT[0m
+Completed 500 Internal Server Error in 951ms (Views: 0.4ms | ActiveRecord: 946.5ms)
+
+
+  
+AbstractController::DoubleRenderError (Render and/or redirect were called multiple times in this action. Please note that you may only call render OR redirect, and at most once per action. Also note that neither redirect nor render terminate execution of the action, so if you want to exit an action after redirecting, you need to do something like "redirect_to(...) and return".):
+  
+app/controllers/user_devices_controller.rb:30:in `create'
+Started POST "/user_devices/" for 127.0.0.1 at 2017-09-21 01:56:05 -0500
+Processing by UserDevicesController#create as */*
+  Parameters: {"username"=>"laWe2a", "device_id"=>"awdawd", "user_device"=>{"username"=>"laWe2a", "device_id"=>"awdawd"}}
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.2ms)[0m  [1m[32mINSERT INTO "user_devices" ("username", "device_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["username", "laWe2a"], ["device_id", "awdawd"], ["created_at", "2017-09-21 06:56:05.634119"], ["updated_at", "2017-09-21 06:56:05.634119"]]
+  [1m[35m (34.8ms)[0m  [1m[35mCOMMIT[0m
+Completed 200 OK in 42ms (Views: 0.2ms | ActiveRecord: 38.1ms)
+
+
+Started POST "/user_devices/" for 127.0.0.1 at 2017-09-21 01:56:58 -0500
+Processing by UserDevicesController#create as */*
+  Parameters: {"username"=>"laWe2a", "device_id"=>"awdawd", "user_device"=>{"username"=>"laWe2a", "device_id"=>"awdawd"}}
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.3ms)[0m  [1m[32mINSERT INTO "user_devices" ("username", "device_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["username", "laWe2a"], ["device_id", "awdawd"], ["created_at", "2017-09-21 06:56:58.643010"], ["updated_at", "2017-09-21 06:56:58.643010"]]
+  [1m[35m (202.3ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mRpush::Client::ActiveRecord::Gcm::App Load (0.4ms)[0m  [1m[34mSELECT  "rpush_apps".* FROM "rpush_apps" WHERE "rpush_apps"."type" IN ('Rpush::Client::ActiveRecord::Gcm::App') AND "rpush_apps"."name" = $1 LIMIT $2[0m  [["name", "android-app"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mRpush::Client::ActiveRecord::App Exists (0.4ms)[0m  [1m[34mSELECT  1 AS one FROM "rpush_apps" WHERE "rpush_apps"."name" = $1 AND "rpush_apps"."type" = $2 AND "rpush_apps"."environment" IS NULL LIMIT $3[0m  [["name", "android_app"], ["type", "Rpush::Client::ActiveRecord::Gcm::App"], ["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[31mROLLBACK[0m
+Completed 422 Unprocessable Entity in 218ms (ActiveRecord: 206.6ms)
+
+
+  
+ActiveRecord::RecordInvalid (Validation failed: Name has already been taken):
+  
+app/controllers/user_devices_controller.rb:17:in `create_push'
+app/controllers/user_devices_controller.rb:45:in `create'
+Started POST "/user_devices/" for 127.0.0.1 at 2017-09-21 01:58:07 -0500
+Processing by UserDevicesController#create as */*
+  Parameters: {"username"=>"laWe2a", "device_id"=>"awdawd", "user_device"=>{"username"=>"laWe2a", "device_id"=>"awdawd"}}
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.3ms)[0m  [1m[32mINSERT INTO "user_devices" ("username", "device_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["username", "laWe2a"], ["device_id", "awdawd"], ["created_at", "2017-09-21 06:58:07.671491"], ["updated_at", "2017-09-21 06:58:07.671491"]]
+  [1m[35m (16.0ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mRpush::Client::ActiveRecord::Gcm::App Load (0.3ms)[0m  [1m[34mSELECT  "rpush_apps".* FROM "rpush_apps" WHERE "rpush_apps"."type" IN ('Rpush::Client::ActiveRecord::Gcm::App') AND "rpush_apps"."name" = $1 LIMIT $2[0m  [["name", "android_app"], ["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.5ms)[0m  [1m[32mINSERT INTO "rpush_notifications" ("data", "created_at", "updated_at", "type", "registration_ids", "app_id") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["data", "{\"message\":\"You got a new message!\"}"], ["created_at", "2017-09-21 06:58:07.740125"], ["updated_at", "2017-09-21 06:58:07.740125"], ["type", "Rpush::Client::ActiveRecord::Gcm::Notification"], ["registration_ids", "---\n- awdawd\n"], ["app_id", 1]]
+  [1m[35m (69.3ms)[0m  [1m[35mCOMMIT[0m
+Completed 204 No Content in 150ms (ActiveRecord: 92.5ms)
+
+
+Started GET "/user_devices/" for 127.0.0.1 at 2017-09-21 01:58:14 -0500
+Processing by UserDevicesController#index as */*
+  Parameters: {"user_device"=>{}}
+  [1m[36mUserDevice Load (0.2ms)[0m  [1m[34mSELECT "user_devices".* FROM "user_devices"[0m
+Completed 200 OK in 3ms (Views: 2.7ms | ActiveRecord: 0.2ms)
+
+
+Started DELETE "/user_devices/1" for 127.0.0.1 at 2017-09-21 01:58:23 -0500
+Processing by UserDevicesController#destroy as */*
+  Parameters: {"username"=>"laWe2a", "device_id"=>"awdawd", "id"=>"1", "user_device"=>{"username"=>"laWe2a", "device_id"=>"awdawd"}}
+  [1m[36mUserDevice Load (0.3ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 1], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.3ms)[0m  [1m[31mDELETE FROM "user_devices" WHERE "user_devices"."id" = $1[0m  [["id", 1]]
+  [1m[35m (16.2ms)[0m  [1m[35mCOMMIT[0m
+Completed 204 No Content in 19ms (ActiveRecord: 16.8ms)
+
+
+Started DELETE "/user_devices/2" for 127.0.0.1 at 2017-09-21 01:58:26 -0500
+Processing by UserDevicesController#destroy as */*
+  Parameters: {"username"=>"laWe2a", "device_id"=>"awdawd", "id"=>"2", "user_device"=>{"username"=>"laWe2a", "device_id"=>"awdawd"}}
+  [1m[36mUserDevice Load (0.2ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.5ms)[0m  [1m[31mDELETE FROM "user_devices" WHERE "user_devices"."id" = $1[0m  [["id", 2]]
+  [1m[35m (29.5ms)[0m  [1m[35mCOMMIT[0m
+Completed 204 No Content in 33ms (ActiveRecord: 30.3ms)
+
+
+Started DELETE "/user_devices/1" for 127.0.0.1 at 2017-09-21 01:58:28 -0500
+Processing by UserDevicesController#destroy as */*
+  Parameters: {"username"=>"laWe2a", "device_id"=>"awdawd", "id"=>"1", "user_device"=>{"username"=>"laWe2a", "device_id"=>"awdawd"}}
+  [1m[36mUserDevice Load (0.3ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 1], ["LIMIT", 1]]
+Completed 404 Not Found in 1ms (ActiveRecord: 0.3ms)
+
+
+  
+ActiveRecord::RecordNotFound (Couldn't find UserDevice with 'id'=1):
+  
+app/controllers/user_devices_controller.rb:71:in `set_user_device'
+Started DELETE "/user_devices/3" for 127.0.0.1 at 2017-09-21 01:58:32 -0500
+Processing by UserDevicesController#destroy as */*
+  Parameters: {"username"=>"laWe2a", "device_id"=>"awdawd", "id"=>"3", "user_device"=>{"username"=>"laWe2a", "device_id"=>"awdawd"}}
+  [1m[36mUserDevice Load (0.2ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 3], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.2ms)[0m  [1m[31mDELETE FROM "user_devices" WHERE "user_devices"."id" = $1[0m  [["id", 3]]
+  [1m[35m (772.8ms)[0m  [1m[35mCOMMIT[0m
+Completed 204 No Content in 804ms (ActiveRecord: 773.4ms)
+
+
+Started DELETE "/user_devices/4" for 127.0.0.1 at 2017-09-21 01:58:34 -0500
+Processing by UserDevicesController#destroy as */*
+  Parameters: {"username"=>"laWe2a", "device_id"=>"awdawd", "id"=>"4", "user_device"=>{"username"=>"laWe2a", "device_id"=>"awdawd"}}
+  [1m[36mUserDevice Load (0.4ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 4], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.2ms)[0m  [1m[31mDELETE FROM "user_devices" WHERE "user_devices"."id" = $1[0m  [["id", 4]]
+  [1m[35m (20.4ms)[0m  [1m[35mCOMMIT[0m
+Completed 204 No Content in 24ms (ActiveRecord: 21.1ms)
+
+
+Started DELETE "/user_devices/5" for 127.0.0.1 at 2017-09-21 01:58:36 -0500
+Processing by UserDevicesController#destroy as */*
+  Parameters: {"username"=>"laWe2a", "device_id"=>"awdawd", "id"=>"5", "user_device"=>{"username"=>"laWe2a", "device_id"=>"awdawd"}}
+  [1m[36mUserDevice Load (0.2ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 5], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.3ms)[0m  [1m[31mDELETE FROM "user_devices" WHERE "user_devices"."id" = $1[0m  [["id", 5]]
+  [1m[35m (17.6ms)[0m  [1m[35mCOMMIT[0m
+Completed 204 No Content in 20ms (ActiveRecord: 18.1ms)
+
+
+Started DELETE "/user_devices/6" for 127.0.0.1 at 2017-09-21 01:58:39 -0500
+Processing by UserDevicesController#destroy as */*
+  Parameters: {"username"=>"laWe2a", "device_id"=>"awdawd", "id"=>"6", "user_device"=>{"username"=>"laWe2a", "device_id"=>"awdawd"}}
+  [1m[36mUserDevice Load (0.2ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 6], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.3ms)[0m  [1m[31mDELETE FROM "user_devices" WHERE "user_devices"."id" = $1[0m  [["id", 6]]
+  [1m[35m (14.2ms)[0m  [1m[35mCOMMIT[0m
+Completed 204 No Content in 17ms (ActiveRecord: 14.8ms)
+
+
+Started DELETE "/user_devices/7" for 127.0.0.1 at 2017-09-21 01:58:41 -0500
+Processing by UserDevicesController#destroy as */*
+  Parameters: {"username"=>"laWe2a", "device_id"=>"awdawd", "id"=>"7", "user_device"=>{"username"=>"laWe2a", "device_id"=>"awdawd"}}
+  [1m[36mUserDevice Load (0.2ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 7], ["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.3ms)[0m  [1m[31mDELETE FROM "user_devices" WHERE "user_devices"."id" = $1[0m  [["id", 7]]
+  [1m[35m (17.1ms)[0m  [1m[35mCOMMIT[0m
+Completed 204 No Content in 20ms (ActiveRecord: 17.9ms)
+
+
+Started DELETE "/user_devices/8" for 127.0.0.1 at 2017-09-21 01:58:43 -0500
+Processing by UserDevicesController#destroy as */*
+  Parameters: {"username"=>"laWe2a", "device_id"=>"awdawd", "id"=>"8", "user_device"=>{"username"=>"laWe2a", "device_id"=>"awdawd"}}
+  [1m[36mUserDevice Load (0.4ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 8], ["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.3ms)[0m  [1m[31mDELETE FROM "user_devices" WHERE "user_devices"."id" = $1[0m  [["id", 8]]
+  [1m[35m (29.5ms)[0m  [1m[35mCOMMIT[0m
+Completed 204 No Content in 33ms (ActiveRecord: 30.4ms)
+
+
+Started DELETE "/user_devices/9" for 127.0.0.1 at 2017-09-21 01:58:46 -0500
+Processing by UserDevicesController#destroy as */*
+  Parameters: {"username"=>"laWe2a", "device_id"=>"awdawd", "id"=>"9", "user_device"=>{"username"=>"laWe2a", "device_id"=>"awdawd"}}
+  [1m[36mUserDevice Load (0.1ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 9], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.2ms)[0m  [1m[31mDELETE FROM "user_devices" WHERE "user_devices"."id" = $1[0m  [["id", 9]]
+  [1m[35m (24.2ms)[0m  [1m[35mCOMMIT[0m
+Completed 204 No Content in 26ms (ActiveRecord: 24.6ms)
+
+
+Started DELETE "/user_devices/10" for 127.0.0.1 at 2017-09-21 01:58:49 -0500
+Processing by UserDevicesController#destroy as */*
+  Parameters: {"username"=>"laWe2a", "device_id"=>"awdawd", "id"=>"10", "user_device"=>{"username"=>"laWe2a", "device_id"=>"awdawd"}}
+  [1m[36mUserDevice Load (0.2ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 10], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.3ms)[0m  [1m[31mDELETE FROM "user_devices" WHERE "user_devices"."id" = $1[0m  [["id", 10]]
+  [1m[35m (84.3ms)[0m  [1m[35mCOMMIT[0m
+Completed 204 No Content in 87ms (ActiveRecord: 84.9ms)
+
+
+Started DELETE "/user_devices/11" for 127.0.0.1 at 2017-09-21 01:58:52 -0500
+Processing by UserDevicesController#destroy as */*
+  Parameters: {"username"=>"laWe2a", "device_id"=>"awdawd", "id"=>"11", "user_device"=>{"username"=>"laWe2a", "device_id"=>"awdawd"}}
+  [1m[36mUserDevice Load (0.2ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 11], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.2ms)[0m  [1m[31mDELETE FROM "user_devices" WHERE "user_devices"."id" = $1[0m  [["id", 11]]
+  [1m[35m (16.5ms)[0m  [1m[35mCOMMIT[0m
+Completed 204 No Content in 19ms (ActiveRecord: 17.1ms)
+
+
+Started GET "/user_devices" for 127.0.0.1 at 2017-09-21 01:58:57 -0500
+Processing by UserDevicesController#index as */*
+  Parameters: {"user_device"=>{}}
+  [1m[36mUserDevice Load (0.2ms)[0m  [1m[34mSELECT "user_devices".* FROM "user_devices"[0m
+Completed 200 OK in 1ms (Views: 0.7ms | ActiveRecord: 0.2ms)
+
+
+Started POST "/user_devices" for 127.0.0.1 at 2017-09-21 01:59:32 -0500
+Processing by UserDevicesController#create as */*
+  Parameters: {"username"=>"laWea", "device_id"=>"awdawd", "user_device"=>{"username"=>"laWea", "device_id"=>"awdawd"}}
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.2ms)[0m  [1m[32mINSERT INTO "user_devices" ("username", "device_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["username", "laWea"], ["device_id", "awdawd"], ["created_at", "2017-09-21 06:59:32.363958"], ["updated_at", "2017-09-21 06:59:32.363958"]]
+  [1m[35m (20.5ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mRpush::Client::ActiveRecord::Gcm::App Load (0.3ms)[0m  [1m[34mSELECT  "rpush_apps".* FROM "rpush_apps" WHERE "rpush_apps"."type" IN ('Rpush::Client::ActiveRecord::Gcm::App') AND "rpush_apps"."name" = $1 LIMIT $2[0m  [["name", "android_app"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.2ms)[0m  [1m[32mINSERT INTO "rpush_notifications" ("data", "created_at", "updated_at", "type", "registration_ids", "app_id") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["data", "{\"message\":\"You got a new message!\"}"], ["created_at", "2017-09-21 06:59:32.388074"], ["updated_at", "2017-09-21 06:59:32.388074"], ["type", "Rpush::Client::ActiveRecord::Gcm::Notification"], ["registration_ids", "---\n- awdawd\n"], ["app_id", 1]]
+  [1m[35m (73.9ms)[0m  [1m[35mCOMMIT[0m
+Completed 204 No Content in 702ms (ActiveRecord: 100.4ms)
+
+
+Started GET "/user_devices" for 127.0.0.1 at 2017-09-21 01:59:39 -0500
+Processing by UserDevicesController#index as */*
+  Parameters: {"user_device"=>{}}
+Completed 200 OK in 3ms (Views: 1.9ms | ActiveRecord: 0.3ms)
+
+
+Started POST "/user_devices" for 127.0.0.1 at 2017-09-21 02:01:00 -0500
+Processing by UserDevicesController#create as */*
+  Parameters: {"username"=>"laWe2a", "device_id"=>"awdawd", "user_device"=>{"username"=>"laWe2a", "device_id"=>"awdawd"}}
+Completed 200 OK in 1222ms (Views: 0.3ms | ActiveRecord: 420.8ms)
+
+
+Started GET "/user_devices" for 127.0.0.1 at 2017-09-21 02:09:27 -0500
+Processing by UserDevicesController#index as */*
+  Parameters: {"user_device"=>{}}
+Completed 200 OK in 6ms (Views: 4.8ms | ActiveRecord: 0.3ms)
+
+
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT pg_try_advisory_lock(6931697059447046565)[0m
+  [1m[35m (0.5ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to CreateNotifications (20170921072442)
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (86.5ms)[0m  [1m[35mCREATE TABLE "notifications" ("id" bigserial primary key, "username" character varying, "sender" character varying, "created_at" timestamp NOT NULL, "updated_at" timestamp NOT NULL)[0m
+  [1m[35mSQL (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20170921072442"]]
+  [1m[35m (9.0ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.5ms)[0m  [1m[34mSELECT  "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1 LIMIT $2[0m  [["key", "environment"], ["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT pg_advisory_unlock(6931697059447046565)[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mUserDevice Load (0.3ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 1], ["LIMIT", 1]]
+  [1m[36mUserDevice Load (0.8ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 12], ["LIMIT", 1]]
+Started GET "/notifications" for 127.0.0.1 at 2017-09-21 02:29:34 -0500
+  [1m[35m (0.5ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Processing by NotificationsController#index as */*
+  Parameters: {"notification"=>{}}
+  [1m[36mNotification Load (0.3ms)[0m  [1m[34mSELECT "notifications".* FROM "notifications"[0m
+Completed 200 OK in 1ms (Views: 0.6ms | ActiveRecord: 2.2ms)
+
+
+Started POST "/notifications" for 127.0.0.1 at 2017-09-21 02:29:50 -0500
+Processing by NotificationsController#create as */*
+  Parameters: {"username"=>"test1", "sender"=>"test1", "notification"=>{"username"=>"test1", "sender"=>"test1"}}
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.6ms)[0m  [1m[32mINSERT INTO "notifications" ("username", "sender", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["username", "test1"], ["sender", "test1"], ["created_at", "2017-09-21 07:29:50.062204"], ["updated_at", "2017-09-21 07:29:50.062204"]]
+  [1m[35m (328.6ms)[0m  [1m[35mCOMMIT[0m
+Completed 201 Created in 343ms (Views: 1.3ms | ActiveRecord: 330.9ms)
+
+
+Started POST "/notifications" for 127.0.0.1 at 2017-09-21 02:30:01 -0500
+Processing by NotificationsController#create as */*
+  Parameters: {"username"=>"laWea", "sender"=>"test2", "notification"=>{"username"=>"laWea", "sender"=>"test2"}}
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.2ms)[0m  [1m[32mINSERT INTO "notifications" ("username", "sender", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["username", "laWea"], ["sender", "test2"], ["created_at", "2017-09-21 07:30:01.327376"], ["updated_at", "2017-09-21 07:30:01.327376"]]
+  [1m[35m (14.3ms)[0m  [1m[35mCOMMIT[0m
+Completed 201 Created in 18ms (Views: 0.6ms | ActiveRecord: 14.7ms)
+
+
+Started GET "/user_devices/" for 127.0.0.1 at 2017-09-21 02:30:07 -0500
+Processing by UserDevicesController#index as */*
+  Parameters: {"user_device"=>{}}
+  [1m[36mUserDevice Load (1.0ms)[0m  [1m[34mSELECT "user_devices".* FROM "user_devices"[0m
+Completed 200 OK in 13ms (Views: 9.6ms | ActiveRecord: 4.2ms)
+
+
+  [1m[36mUserDevice Load (0.3ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 12], ["LIMIT", 1]]
+  [1m[36mUserDevice Load (0.3ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."username" = $1 LIMIT $2[0m  [["username", "laWe2a"], ["LIMIT", 11]]
+  [1m[36mUserDevice Load (0.7ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."username" = $1 LIMIT $2[0m  [["username", "laWe2a"], ["LIMIT", 11]]
+  [1m[36mUserDevice Load (0.5ms)[0m  [1m[34mSELECT  "user_devices"."device_id" FROM "user_devices" WHERE "user_devices"."username" = $1 LIMIT $2[0m  [["username", "laWe2a"], ["LIMIT", 11]]
+  [1m[36mUserDevice Load (0.6ms)[0m  [1m[34mSELECT  "user_devices"."device_id" FROM "user_devices" WHERE "user_devices"."username" = $1 LIMIT $2[0m  [["username", "laWea"], ["LIMIT", 11]]
+Started POST "/user_devices/" for 127.0.0.1 at 2017-09-21 02:34:58 -0500
+Processing by UserDevicesController#create as */*
+  Parameters: {"username"=>"laWea3", "device_id"=>"test2", "user_device"=>{"username"=>"laWea3", "device_id"=>"test2"}}
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.3ms)[0m  [1m[32mINSERT INTO "user_devices" ("username", "device_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["username", "laWea3"], ["device_id", "test2"], ["created_at", "2017-09-21 07:34:58.068061"], ["updated_at", "2017-09-21 07:34:58.068061"]]
+  [1m[35m (11.7ms)[0m  [1m[35mCOMMIT[0m
+Completed 201 Created in 16ms (Views: 1.3ms | ActiveRecord: 12.2ms)
+
+
+Started GET "/user_devices/" for 127.0.0.1 at 2017-09-21 02:35:00 -0500
+Processing by UserDevicesController#index as */*
+  Parameters: {"user_device"=>{}}
+  [1m[36mUserDevice Load (0.3ms)[0m  [1m[34mSELECT "user_devices".* FROM "user_devices"[0m
+Completed 200 OK in 2ms (Views: 1.6ms | ActiveRecord: 0.3ms)
+
+
+  [1m[36mUserDevice Load (0.7ms)[0m  [1m[34mSELECT  "user_devices"."device_id" FROM "user_devices" WHERE "user_devices"."username" = $1 LIMIT $2[0m  [["username", "laWea3"], ["LIMIT", 11]]
+  [1m[36mUserDevice Load (0.7ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."username" = $1 LIMIT $2[0m  [["username", "laWe2a"], ["LIMIT", 11]]
+  [1m[36mUserDevice Load (0.2ms)[0m  [1m[34mSELECT  "user_devices"."username" FROM "user_devices" LIMIT $1[0m  [["LIMIT", 11]]
+  [1m[36mUserDevice Load (0.8ms)[0m  [1m[34mSELECT  "user_devices"."device_id" FROM "user_devices" WHERE "user_devices"."username" = $1 LIMIT $2[0m  [["username", "laWea3"], ["LIMIT", 11]]
+  [1m[36mNotification Load (0.7ms)[0m  [1m[34mSELECT  "notifications".* FROM "notifications" LIMIT $1[0m  [["LIMIT", 11]]
+  [1m[36mUserDevice Load (0.3ms)[0m  [1m[34mSELECT  "user_devices"."device_id" FROM "user_devices" WHERE "user_devices"."username" = $1 LIMIT $2[0m  [["username", "laWea3"], ["LIMIT", 11]]
+Started GET "/notifications" for 127.0.0.1 at 2017-09-21 03:08:35 -0500
+  
+SyntaxError (/home/steven/Documents/Arqui/Project/sam_notifications_ms/app/controllers/notifications_controller.rb:33: syntax error, unexpected ':', expecting keyword_end
+    render :json: @user_device #=> new_json
+                 ^):
+  
+app/controllers/notifications_controller.rb:33: syntax error, unexpected ':', expecting keyword_end
+Started GET "/notifications" for 127.0.0.1 at 2017-09-21 03:09:18 -0500
+  
+SyntaxError (/home/steven/Documents/Arqui/Project/sam_notifications_ms/app/controllers/notifications_controller.rb:33: syntax error, unexpected ':', expecting keyword_end
+    render :json: @user_device
+                 ^):
+  
+app/controllers/notifications_controller.rb:33: syntax error, unexpected ':', expecting keyword_end
+Started GET "/notifications" for 127.0.0.1 at 2017-09-21 03:09:40 -0500
+Processing by NotificationsController#index as */*
+  Parameters: {"notification"=>{}}
+  [1m[36mNotification Load (0.2ms)[0m  [1m[34mSELECT "notifications".* FROM "notifications"[0m
+Completed 200 OK in 7ms (Views: 4.8ms | ActiveRecord: 3.1ms)
+
+
+Started POST "/notifications" for 127.0.0.1 at 2017-09-21 03:10:22 -0500
+Processing by NotificationsController#create as */*
+  Parameters: {"username"=>"laWea3", "sender"=>"test4", "notification"=>{"username"=>"laWea3", "sender"=>"test4"}}
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.3ms)[0m  [1m[32mINSERT INTO "notifications" ("username", "sender", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["username", "laWea3"], ["sender", "test4"], ["created_at", "2017-09-21 08:10:22.026281"], ["updated_at", "2017-09-21 08:10:22.026281"]]
+  [1m[35m (14.5ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mUserDevice Load (0.3ms)[0m  [1m[34mSELECT "user_devices"."device_id" FROM "user_devices" WHERE "user_devices"."username" = $1[0m  [["username", "laWea3"]]
+Completed 200 OK in 30ms (Views: 7.1ms | ActiveRecord: 17.4ms)
+
+
+Started POST "/notifications" for 127.0.0.1 at 2017-09-21 03:10:56 -0500
+Processing by NotificationsController#create as */*
+  Parameters: {"username"=>"laWea3", "sender"=>"test4", "notification"=>{"username"=>"laWea3", "sender"=>"test4"}}
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.2ms)[0m  [1m[32mINSERT INTO "notifications" ("username", "sender", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["username", "laWea3"], ["sender", "test4"], ["created_at", "2017-09-21 08:10:56.830103"], ["updated_at", "2017-09-21 08:10:56.830103"]]
+  [1m[35m (14.6ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mUserDevice Load (0.4ms)[0m  [1m[34mSELECT  "user_devices"."device_id" FROM "user_devices" WHERE "user_devices"."username" = $1 LIMIT $2[0m  [["username", "laWea3"], ["LIMIT", 11]]
+Completed 500 Internal Server Error in 38ms (ActiveRecord: 18.6ms)
+
+
+  
+  [1m[36mCACHE UserDevice Load (0.0ms)[0m  [1m[34mSELECT  "user_devices"."device_id" FROM "user_devices" WHERE "user_devices"."username" = $1 LIMIT $2[0m  [["username", "laWea3"], ["LIMIT", 11]]
+NoMethodError (undefined method `device_id' for #<UserDevice::ActiveRecord_Relation:0x005629f1522be8>):
+  
+app/controllers/notifications_controller.rb:33:in `create_push'
+app/controllers/notifications_controller.rb:47:in `create'
+  [1m[36mCACHE UserDevice Load (0.0ms)[0m  [1m[34mSELECT  "user_devices"."device_id" FROM "user_devices" WHERE "user_devices"."username" = $1 LIMIT $2[0m  [["username", "laWea3"], ["LIMIT", 11]]
+Started POST "/notifications" for 127.0.0.1 at 2017-09-21 03:16:13 -0500
+Processing by NotificationsController#create as */*
+  Parameters: {"username"=>"laWea3", "sender"=>"test4", "notification"=>{"username"=>"laWea3", "sender"=>"test4"}}
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.2ms)[0m  [1m[32mINSERT INTO "notifications" ("username", "sender", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["username", "laWea3"], ["sender", "test4"], ["created_at", "2017-09-21 08:16:14.027664"], ["updated_at", "2017-09-21 08:16:14.027664"]]
+  [1m[35m (13.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mRpush::Client::ActiveRecord::Gcm::App Load (0.3ms)[0m  [1m[34mSELECT  "rpush_apps".* FROM "rpush_apps" WHERE "rpush_apps"."type" IN ('Rpush::Client::ActiveRecord::Gcm::App') AND "rpush_apps"."name" = $1 LIMIT $2[0m  [["name", "android_app"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mUserDevice Load (0.2ms)[0m  [1m[34mSELECT "user_devices"."device_id" FROM "user_devices" WHERE "user_devices"."username" = $1[0m  [["username", "laWea3"]]
+  [1m[35mSQL (0.4ms)[0m  [1m[32mINSERT INTO "rpush_notifications" ("data", "created_at", "updated_at", "type", "registration_ids", "app_id") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["data", "{\"message\":\"You got a new message!\"}"], ["created_at", "2017-09-21 08:16:14.139664"], ["updated_at", "2017-09-21 08:16:14.139664"], ["type", "Rpush::Client::ActiveRecord::Gcm::Notification"], ["registration_ids", "---\n- - !ruby/object:UserDevice\n    concise_attributes:\n    - !ruby/object:ActiveRecord::Attribute::FromDatabase\n      name: device_id\n      value_before_type_cast: test2\n    - !ruby/object:ActiveRecord::Attribute::FromDatabase\n      name: id\n    - !ruby/object:ActiveRecord::Attribute::Uninitialized\n      name: username\n    - !ruby/object:ActiveRecord::Attribute::Uninitialized\n      name: created_at\n    - !ruby/object:ActiveRecord::Attribute::Uninitialized\n      name: updated_at\n    new_record: false\n    active_record_yaml_version: 2\n"], ["app_id", 1]]
+  [1m[35m (33.4ms)[0m  [1m[35mCOMMIT[0m
+Completed 204 No Content in 936ms (ActiveRecord: 58.2ms)
+
+
+Started GET "/user_devices/" for 127.0.0.1 at 2017-09-21 03:17:23 -0500
+Processing by UserDevicesController#index as */*
+  Parameters: {"user_device"=>{}}
+Completed 200 OK in 5ms (Views: 4.5ms | ActiveRecord: 0.2ms)
+
+
+Started GET "/notifications" for 127.0.0.1 at 2017-09-21 03:17:34 -0500
+Processing by NotificationsController#index as */*
+  Parameters: {"notification"=>{}}
+Completed 200 OK in 9ms (Views: 5.3ms | ActiveRecord: 5.8ms)
+
+
+Started GET "/user_devices/" for 127.0.0.1 at 2017-09-21 03:17:56 -0500
+Processing by UserDevicesController#index as */*
+  Parameters: {"user_device"=>{}}
+Completed 200 OK in 2ms (Views: 1.8ms | ActiveRecord: 0.4ms)
+
+
+Started POST "/notifications" for 127.0.0.1 at 2017-09-21 03:18:10 -0500
+Processing by NotificationsController#create as */*
+  Parameters: {"username"=>"laWe2a", "sender"=>"test4", "notification"=>{"username"=>"laWe2a", "sender"=>"test4"}}
+Completed 200 OK in 900ms (Views: 0.3ms | ActiveRecord: 151.5ms)
+
+
+  [1m[36mUserDevice Load (0.6ms)[0m  [1m[34mSELECT  "user_devices"."device_id" FROM "user_devices" WHERE "user_devices"."username" = $1 LIMIT $2[0m  [["username", "laWea3"], ["LIMIT", 11]]
+Started GET "/notifications" for 127.0.0.1 at 2017-09-21 19:17:16 -0500
+  [1m[35m (38.6ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Processing by NotificationsController#index as */*
+  Parameters: {"notification"=>{}}
+  [1m[36mNotification Load (14.9ms)[0m  [1m[34mSELECT "notifications".* FROM "notifications"[0m
+Completed 200 OK in 74ms (Views: 31.5ms | ActiveRecord: 76.2ms)
+
+
+Started GET "/notifications" for 127.0.0.1 at 2017-09-21 19:17:54 -0500
+Processing by NotificationsController#index as */*
+  Parameters: {"notification"=>{}}
+  [1m[36mNotification Load (0.3ms)[0m  [1m[34mSELECT "notifications".* FROM "notifications"[0m
+Completed 200 OK in 9ms (Views: 6.0ms | ActiveRecord: 3.5ms)
+
+
+Started GET "/user_devices/" for 127.0.0.1 at 2017-09-21 19:18:03 -0500
+Processing by UserDevicesController#index as */*
+  Parameters: {"user_device"=>{}}
+  [1m[36mUserDevice Load (39.4ms)[0m  [1m[34mSELECT "user_devices".* FROM "user_devices"[0m
+Completed 200 OK in 99ms (Views: 56.5ms | ActiveRecord: 43.5ms)
+
+
+Started GET "/user_devices/" for 127.0.0.1 at 2017-09-21 19:18:24 -0500
+Processing by UserDevicesController#index as */*
+  Parameters: {"user_device"=>{}}
+  [1m[36mUserDevice Load (0.3ms)[0m  [1m[34mSELECT "user_devices".* FROM "user_devices"[0m
+Completed 200 OK in 10ms (Views: 7.4ms | ActiveRecord: 3.7ms)
+
+
+Started GET "/user_devices/1" for 127.0.0.1 at 2017-09-21 19:22:02 -0500
+Processing by UserDevicesController#show as */*
+  Parameters: {"id"=>"1", "user_device"=>{}}
+  [1m[36mUserDevice Load (0.4ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 1], ["LIMIT", 1]]
+Completed 404 Not Found in 27ms (ActiveRecord: 4.2ms)
+
+
+  
+ActiveRecord::RecordNotFound (Couldn't find UserDevice with 'id'=1):
+  
+app/controllers/user_devices_controller.rb:43:in `set_user_device'
+Started GET "/user_devices/12" for 127.0.0.1 at 2017-09-21 19:22:08 -0500
+Processing by UserDevicesController#show as */*
+  Parameters: {"id"=>"12", "user_device"=>{}}
+  [1m[36mUserDevice Load (0.2ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 12], ["LIMIT", 1]]
+Completed 200 OK in 8ms (Views: 0.6ms | ActiveRecord: 0.2ms)
+
+
+Started GET "/user_devices/12" for 127.0.0.1 at 2017-09-21 19:22:14 -0500
+Processing by UserDevicesController#show as */*
+  Parameters: {"id"=>"12", "user_device"=>{}}
+  [1m[36mUserDevice Load (0.2ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 12], ["LIMIT", 1]]
+Completed 200 OK in 7ms (Views: 0.4ms | ActiveRecord: 2.8ms)
+
+
+Started GET "/user_devices/12" for 127.0.0.1 at 2017-09-21 19:22:15 -0500
+Processing by UserDevicesController#show as */*
+  Parameters: {"id"=>"12", "user_device"=>{}}
+  [1m[36mUserDevice Load (0.2ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 12], ["LIMIT", 1]]
+Completed 200 OK in 2ms (Views: 0.4ms | ActiveRecord: 0.2ms)
+
+
+Started GET "/user_devices/12" for 127.0.0.1 at 2017-09-21 19:22:15 -0500
+Processing by UserDevicesController#show as */*
+  Parameters: {"id"=>"12", "user_device"=>{}}
+  [1m[36mUserDevice Load (0.3ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 12], ["LIMIT", 1]]
+Completed 200 OK in 2ms (Views: 0.6ms | ActiveRecord: 0.3ms)
+
+
+Started GET "/user_devices/12" for 127.0.0.1 at 2017-09-21 19:22:16 -0500
+Processing by UserDevicesController#show as */*
+  Parameters: {"id"=>"12", "user_device"=>{}}
+  [1m[36mUserDevice Load (0.3ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 12], ["LIMIT", 1]]
+Completed 200 OK in 2ms (Views: 0.4ms | ActiveRecord: 0.3ms)
+
+
+Started GET "/user_devices/12" for 127.0.0.1 at 2017-09-21 19:22:47 -0500
+Processing by UserDevicesController#show as */*
+  Parameters: {"id"=>"12", "user_device"=>{}}
+  [1m[36mUserDevice Load (0.1ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 12], ["LIMIT", 1]]
+Completed 200 OK in 7ms (Views: 0.6ms | ActiveRecord: 2.5ms)
+
+
+Started GET "/user_devices/12" for 127.0.0.1 at 2017-09-21 19:22:57 -0500
+Processing by UserDevicesController#show as */*
+  Parameters: {"id"=>"12", "user_device"=>{}}
+  [1m[36mUserDevice Load (0.2ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 12], ["LIMIT", 1]]
+Completed 200 OK in 9ms (Views: 0.5ms | ActiveRecord: 4.5ms)
+
+
+Started GET "/user_devices/12" for 127.0.0.1 at 2017-09-21 19:22:58 -0500
+Processing by UserDevicesController#show as */*
+  Parameters: {"id"=>"12", "user_device"=>{}}
+  [1m[36mUserDevice Load (0.1ms)[0m  [1m[34mSELECT  "user_devices".* FROM "user_devices" WHERE "user_devices"."id" = $1 LIMIT $2[0m  [["id", 12], ["LIMIT", 1]]
+Completed 200 OK in 1ms (Views: 0.4ms | ActiveRecord: 0.1ms)
+
+
+Started GET "/user_devices" for 127.0.0.1 at 2017-09-21 19:23:00 -0500
+Processing by UserDevicesController#index as */*
+  Parameters: {"user_device"=>{}}
+  [1m[36mUserDevice Load (0.2ms)[0m  [1m[34mSELECT "user_devices".* FROM "user_devices"[0m
+Completed 200 OK in 3ms (Views: 2.3ms | ActiveRecord: 0.2ms)
+
+
+Started GET "/user_devices" for 127.0.0.1 at 2017-09-21 19:23:08 -0500
+Processing by UserDevicesController#index as */*
+  Parameters: {"user_device"=>{}}
+  [1m[36mUserDevice Load (0.2ms)[0m  [1m[34mSELECT "user_devices".* FROM "user_devices"[0m
+Completed 200 OK in 8ms (Views: 5.9ms | ActiveRecord: 2.7ms)
+
+
+  [1m[35m (232.6ms)[0m  [1m[35mDROP DATABASE IF EXISTS "notifications_db"[0m
+  [1m[35m (0.5ms)[0m  [1m[35mDROP DATABASE IF EXISTS "notifications_db"[0m
+  [1m[35m (149.7ms)[0m  [1m[35mCREATE TABLE "schema_migrations" ("version" character varying NOT NULL PRIMARY KEY)[0m
+  [1m[35m (99.1ms)[0m  [1m[35mCREATE TABLE "ar_internal_metadata" ("key" character varying NOT NULL PRIMARY KEY, "value" character varying, "created_at" timestamp NOT NULL, "updated_at" timestamp NOT NULL)[0m
+  [1m[35m (0.9ms)[0m  [1m[34mSELECT pg_try_advisory_lock(2808627241692089685)[0m
+  [1m[35m (1.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to AddRpush (20170921050234)
+  [1m[35m (0.5ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (97.0ms)[0m  [1m[35mCREATE TABLE "rapns_notifications" ("id" bigserial primary key, "badge" integer, "device_token" character varying(64) NOT NULL, "sound" character varying DEFAULT '1.aiff', "alert" character varying, "attributes_for_device" text, "expiry" integer DEFAULT 86400 NOT NULL, "delivered" boolean DEFAULT 'f' NOT NULL, "delivered_at" timestamp, "failed" boolean DEFAULT 'f' NOT NULL, "failed_at" timestamp, "error_code" integer, "error_description" character varying, "deliver_after" timestamp, "created_at" timestamp NOT NULL, "updated_at" timestamp NOT NULL)[0m
+  [1m[35m (58.1ms)[0m  [1m[35mCREATE  INDEX  "index_rapns_notifications_multi" ON "rapns_notifications"  ("delivered", "failed", "deliver_after")[0m
+  [1m[35m (32.4ms)[0m  [1m[35mCREATE TABLE "rapns_feedback" ("id" bigserial primary key, "device_token" character varying(64) NOT NULL, "failed_at" timestamp NOT NULL, "created_at" timestamp NOT NULL, "updated_at" timestamp NOT NULL)[0m
+  [1m[35m (32.1ms)[0m  [1m[35mCREATE  INDEX  "index_rapns_feedback_on_device_token" ON "rapns_feedback"  ("device_token")[0m
+  [1m[35m (102.1ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ADD "alert_is_json" boolean DEFAULT 'f'[0m
+  [1m[35m (0.7ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ADD "app" character varying[0m
+  [1m[35m (31.0ms)[0m  [1m[35mALTER TABLE "rapns_feedback" ADD "app" character varying[0m
+  [1m[35m (51.9ms)[0m  [1m[35mCREATE TABLE "rapns_apps" ("id" bigserial primary key, "key" character varying NOT NULL, "environment" character varying NOT NULL, "certificate" text NOT NULL, "password" character varying, "connections" integer DEFAULT 1 NOT NULL, "created_at" timestamp NOT NULL, "updated_at" timestamp NOT NULL)[0m
+  [1m[35m (1.1ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ADD "type" character varying[0m
+  [1m[35m (0.9ms)[0m  [1m[35mALTER TABLE "rapns_apps" ADD "type" character varying[0m
+  [1m[35mSQL (1.1ms)[0m  [1m[33mUPDATE "rapns_notifications" SET "type" = 'Rapns::Apns::Notification'[0m
+  [1m[35mSQL (1.0ms)[0m  [1m[33mUPDATE "rapns_apps" SET "type" = 'Rapns::Apns::App'[0m
+  [1m[35m (0.9ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER COLUMN "type" TYPE character varying[0m
+  [1m[35m (0.7ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER "type" SET NOT NULL[0m
+  [1m[35m (0.8ms)[0m  [1m[35mALTER TABLE "rapns_apps" ALTER COLUMN "type" TYPE character varying[0m
+  [1m[35m (0.7ms)[0m  [1m[35mALTER TABLE "rapns_apps" ALTER "type" SET NOT NULL[0m
+  [1m[35m (1.2ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER COLUMN "device_token" TYPE character varying(64)[0m
+  [1m[35m (0.7ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER "device_token" DROP NOT NULL[0m
+  [1m[35m (1.8ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER COLUMN "expiry" TYPE integer[0m
+  [1m[35m (1.0ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER COLUMN "expiry" SET DEFAULT 86400[0m
+  [1m[35m (0.6ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER "expiry" DROP NOT NULL[0m
+  [1m[35m (0.6ms)[0m  [1m[35mALTER TABLE "rapns_apps" ALTER COLUMN "environment" TYPE character varying[0m
+  [1m[35m (0.5ms)[0m  [1m[35mALTER TABLE "rapns_apps" ALTER "environment" DROP NOT NULL[0m
+  [1m[35m (0.8ms)[0m  [1m[35mALTER TABLE "rapns_apps" ALTER COLUMN "certificate" TYPE text[0m
+  [1m[35m (0.4ms)[0m  [1m[35mALTER TABLE "rapns_apps" ALTER COLUMN "certificate" DROP DEFAULT[0m
+  [1m[35m (0.5ms)[0m  [1m[35mALTER TABLE "rapns_apps" ALTER "certificate" DROP NOT NULL[0m
+  [1m[35m (1.5ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER COLUMN "error_description" TYPE text[0m
+  [1m[35m (0.3ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER COLUMN "error_description" DROP DEFAULT[0m
+  [1m[35m (0.3ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER "error_description" DROP NOT NULL[0m
+  [1m[35m (0.7ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER COLUMN "sound" TYPE character varying[0m
+  [1m[35m (0.6ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER COLUMN "sound" SET DEFAULT 'default'[0m
+  [1m[35m (0.4ms)[0m  [1m[35mALTER TABLE "rapns_notifications" RENAME COLUMN "attributes_for_device" TO "data"[0m
+  [1m[35m (0.5ms)[0m  [1m[35mALTER TABLE "rapns_apps" RENAME COLUMN "key" TO "name"[0m
+  [1m[35m (0.3ms)[0m  [1m[35mALTER TABLE "rapns_apps" ADD "auth_key" character varying[0m
+  [1m[35m (0.3ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ADD "collapse_key" character varying[0m
+  [1m[35m (167.9ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ADD "delay_while_idle" boolean DEFAULT 'f' NOT NULL[0m
+  [1m[35m (0.9ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ADD "registration_ids" text[0m
+  [1m[35m (0.8ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ADD "app_id" integer[0m
+  [1m[35m (107.8ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ADD "retries" integer DEFAULT 0[0m
+  [1m[36mAddRpush::AddGcm::Rapns::App Load (0.9ms)[0m  [1m[34mSELECT "rapns_apps".* FROM "rapns_apps"[0m
+  [1m[35m (0.9ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER COLUMN "app_id" TYPE integer[0m
+  [1m[35m (0.7ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ALTER "app_id" SET NOT NULL[0m
+  [1m[35m (1.6ms)[0m  [1m[35mALTER TABLE "rapns_notifications" DROP "app"[0m
+DEPRECATION WARNING: Passing default to #index_name_exists? is deprecated without replacement. (called from up at /home/alejo/sam_back/sam_notifications_ms/db/migrate/20170921050234_add_rpush.rb:184)
+  [1m[35m (0.7ms)[0m  [1m[35mDROP INDEX  "index_rapns_notifications_multi"[0m
+  [1m[35m (50.2ms)[0m  [1m[35mCREATE  INDEX  "index_rapns_notifications_multi" ON "rapns_notifications"  ("app_id", "delivered", "failed", "deliver_after")[0m
+  [1m[35m (0.9ms)[0m  [1m[35mALTER TABLE "rapns_notifications" ADD "uri" character varying[0m
+  [1m[35m (0.9ms)[0m  [1m[35mALTER TABLE "rapns_apps" ADD "client_id" character varying[0m
+  [1m[35m (0.7ms)[0m  [1m[35mALTER TABLE "rapns_apps" ADD "client_secret" character varying[0m
+  [1m[35m (0.7ms)[0m  [1m[35mALTER TABLE "rapns_apps" ADD "access_token" character varying[0m
+  [1m[35m (0.7ms)[0m  [1m[35mALTER TABLE "rapns_apps" ADD "access_token_expiration" timestamp[0m
+  [1m[35m (0.9ms)[0m  [1m[35mALTER TABLE "rapns_notifications" RENAME TO "rpush_notifications"[0m
+  [1m[35m (1.0ms)[0m  [1m[35mALTER TABLE "public"."rapns_notifications_id_seq" RENAME TO "rpush_notifications_id_seq"[0m
+  [1m[35m (0.8ms)[0m  [1m[35mALTER INDEX "rapns_notifications_pkey" RENAME TO "rpush_notifications_pkey"[0m
+  [1m[35m (0.8ms)[0m  [1m[35mALTER TABLE "rapns_apps" RENAME TO "rpush_apps"[0m
+  [1m[35m (2.0ms)[0m  [1m[35mALTER TABLE "public"."rapns_apps_id_seq" RENAME TO "rpush_apps_id_seq"[0m
+  [1m[35m (1.0ms)[0m  [1m[35mALTER INDEX "rapns_apps_pkey" RENAME TO "rpush_apps_pkey"[0m
+  [1m[35m (0.6ms)[0m  [1m[35mALTER TABLE "rapns_feedback" RENAME TO "rpush_feedback"[0m
+  [1m[35m (0.6ms)[0m  [1m[35mALTER TABLE "public"."rapns_feedback_id_seq" RENAME TO "rpush_feedback_id_seq"[0m
+  [1m[35m (0.6ms)[0m  [1m[35mALTER INDEX "rapns_feedback_pkey" RENAME TO "rpush_feedback_pkey"[0m
+  [1m[35m (1.0ms)[0m  [1m[35mALTER INDEX "index_rapns_feedback_on_device_token" RENAME TO "index_rpush_feedback_on_device_token"[0m
+DEPRECATION WARNING: Passing default to #index_name_exists? is deprecated without replacement. (called from up at /home/alejo/sam_back/sam_notifications_ms/db/migrate/20170921050234_add_rpush.rb:296)
+  [1m[35m (0.3ms)[0m  [1m[35mALTER INDEX "index_rapns_notifications_multi" RENAME TO "index_rpush_notifications_multi"[0m
+DEPRECATION WARNING: Passing default to #index_name_exists? is deprecated without replacement. (called from up at /home/alejo/sam_back/sam_notifications_ms/db/migrate/20170921050234_add_rpush.rb:300)
+  [1m[35mSQL (0.5ms)[0m  [1m[33mUPDATE "rpush_notifications" SET "type" = 'Rpush::Apns::Notification' WHERE "rpush_notifications"."type" = $1[0m  [["type", "Rapns::Apns::Notification"]]
+  [1m[35mSQL (0.3ms)[0m  [1m[33mUPDATE "rpush_notifications" SET "type" = 'Rpush::Gcm::Notification' WHERE "rpush_notifications"."type" = $1[0m  [["type", "Rapns::Gcm::Notification"]]
+  [1m[35mSQL (0.3ms)[0m  [1m[33mUPDATE "rpush_notifications" SET "type" = 'Rpush::Adm::Notification' WHERE "rpush_notifications"."type" = $1[0m  [["type", "Rapns::Adm::Notification"]]
+  [1m[35mSQL (0.3ms)[0m  [1m[33mUPDATE "rpush_notifications" SET "type" = 'Rpush::Wpns::Notification' WHERE "rpush_notifications"."type" = $1[0m  [["type", "Rapns::Wpns::Notification"]]
+  [1m[35mSQL (0.4ms)[0m  [1m[33mUPDATE "rpush_apps" SET "type" = 'Rpush::Apns::App' WHERE "rpush_apps"."type" = $1[0m  [["type", "Rapns::Apns::App"]]
+  [1m[35mSQL (0.4ms)[0m  [1m[33mUPDATE "rpush_apps" SET "type" = 'Rpush::Gcm::App' WHERE "rpush_apps"."type" = $1[0m  [["type", "Rapns::Gcm::App"]]
+  [1m[35mSQL (0.3ms)[0m  [1m[33mUPDATE "rpush_apps" SET "type" = 'Rpush::Adm::App' WHERE "rpush_apps"."type" = $1[0m  [["type", "Rapns::Adm::App"]]
+  [1m[35mSQL (0.3ms)[0m  [1m[33mUPDATE "rpush_apps" SET "type" = 'Rpush::Wpns::App' WHERE "rpush_apps"."type" = $1[0m  [["type", "Rapns::Wpns::App"]]
+  [1m[35m (0.3ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ADD "fail_after" timestamp[0m
+  [1m[35mSQL (0.4ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20170921050234"]]
+  [1m[35m (11.3ms)[0m  [1m[35mCOMMIT[0m
+Migrating to Rpush200Updates (20170921050235)
+  [1m[35m (1.0ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (110.0ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ADD "processing" boolean DEFAULT 'f' NOT NULL[0m
+  [1m[35m (1.0ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ADD "priority" integer[0m
+DEPRECATION WARNING: Passing default to #index_name_exists? is deprecated without replacement. (called from up at /home/alejo/sam_back/sam_notifications_ms/db/migrate/20170921050235_rpush_2_0_0_updates.rb:20)
+  [1m[35m (0.8ms)[0m  [1m[35mDROP INDEX  "index_rpush_notifications_multi"[0m
+  [1m[35m (43.4ms)[0m  [1m[35mCREATE  INDEX  "index_rpush_notifications_multi" ON "rpush_notifications"  ("delivered", "failed") WHERE NOT delivered AND NOT failed[0m
+  [1m[35m (0.8ms)[0m  [1m[35mALTER TABLE "rpush_feedback" RENAME COLUMN "app" TO "app_id"[0m
+  [1m[35m (93.3ms)[0m  [1m[35mALTER TABLE rpush_feedback ALTER COLUMN app_id TYPE integer USING (trim(app_id)::integer)[0m
+  [1m[35mSQL (0.9ms)[0m  [1m[33mUPDATE "rpush_apps" SET "type" = 'Rpush::Client::ActiveRecord::Apns::App' WHERE "rpush_apps"."type" = $1[0m  [["type", "Rpush::Apns::App"]]
+  [1m[35mSQL (1.0ms)[0m  [1m[33mUPDATE "rpush_notifications" SET "type" = 'Rpush::Client::ActiveRecord::Apns::Notification' WHERE "rpush_notifications"."type" = $1[0m  [["type", "Rpush::Apns::Notification"]]
+  [1m[35mSQL (0.5ms)[0m  [1m[33mUPDATE "rpush_apps" SET "type" = 'Rpush::Client::ActiveRecord::Gcm::App' WHERE "rpush_apps"."type" = $1[0m  [["type", "Rpush::Gcm::App"]]
+  [1m[35mSQL (0.5ms)[0m  [1m[33mUPDATE "rpush_notifications" SET "type" = 'Rpush::Client::ActiveRecord::Gcm::Notification' WHERE "rpush_notifications"."type" = $1[0m  [["type", "Rpush::Gcm::Notification"]]
+  [1m[35mSQL (0.5ms)[0m  [1m[33mUPDATE "rpush_apps" SET "type" = 'Rpush::Client::ActiveRecord::Wpns::App' WHERE "rpush_apps"."type" = $1[0m  [["type", "Rpush::Wpns::App"]]
+  [1m[35mSQL (0.4ms)[0m  [1m[33mUPDATE "rpush_notifications" SET "type" = 'Rpush::Client::ActiveRecord::Wpns::Notification' WHERE "rpush_notifications"."type" = $1[0m  [["type", "Rpush::Wpns::Notification"]]
+  [1m[35mSQL (0.6ms)[0m  [1m[33mUPDATE "rpush_apps" SET "type" = 'Rpush::Client::ActiveRecord::Adm::App' WHERE "rpush_apps"."type" = $1[0m  [["type", "Rpush::Adm::App"]]
+  [1m[35mSQL (0.5ms)[0m  [1m[33mUPDATE "rpush_notifications" SET "type" = 'Rpush::Client::ActiveRecord::Adm::Notification' WHERE "rpush_notifications"."type" = $1[0m  [["type", "Rpush::Adm::Notification"]]
+  [1m[35mSQL (0.4ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20170921050235"]]
+  [1m[35m (18.4ms)[0m  [1m[35mCOMMIT[0m
+Migrating to Rpush210Updates (20170921050236)
+  [1m[35m (0.3ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (0.3ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ADD "url_args" text[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ADD "category" character varying[0m
+  [1m[35mSQL (0.3ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20170921050236"]]
+  [1m[35m (18.9ms)[0m  [1m[35mCOMMIT[0m
+Migrating to Rpush260Updates (20170921050237)
+  [1m[35m (0.3ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (108.8ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ADD "content_available" boolean DEFAULT 'f'[0m
+  [1m[35mSQL (0.8ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20170921050237"]]
+  [1m[35m (22.5ms)[0m  [1m[35mCOMMIT[0m
+Migrating to Rpush270Updates (20170921050238)
+  [1m[35m (0.5ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (1.1ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ALTER COLUMN "alert" TYPE text[0m
+  [1m[35m (1.1ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ADD "notification" text[0m
+  [1m[35mSQL (1.5ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20170921050238"]]
+  [1m[35m (10.7ms)[0m  [1m[35mCOMMIT[0m
+Migrating to Rpush300Updates (20170921050239)
+  [1m[35m (0.6ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (118.0ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ADD "mutable_content" boolean DEFAULT 'f'[0m
+  [1m[35m (1.5ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ALTER COLUMN "sound" TYPE character varying[0m
+  [1m[35m (0.8ms)[0m  [1m[35mALTER TABLE "rpush_notifications" ALTER COLUMN "sound" DROP DEFAULT[0m
+  [1m[35mSQL (0.8ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20170921050239"]]
+  [1m[35m (21.5ms)[0m  [1m[35mCOMMIT[0m
+Migrating to CreateUserDevices (20170921062910)
+  [1m[35m (0.6ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (72.7ms)[0m  [1m[35mCREATE TABLE "user_devices" ("id" bigserial primary key, "username" character varying, "device_id" character varying, "created_at" timestamp NOT NULL, "updated_at" timestamp NOT NULL)[0m
+  [1m[35mSQL (0.9ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20170921062910"]]
+  [1m[35m (19.6ms)[0m  [1m[35mCOMMIT[0m
+Migrating to CreateNotifications (20170921072442)
+  [1m[35m (0.7ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (86.0ms)[0m  [1m[35mCREATE TABLE "notifications" ("id" bigserial primary key, "username" character varying, "sender" character varying, "created_at" timestamp NOT NULL, "updated_at" timestamp NOT NULL)[0m
+  [1m[35mSQL (0.8ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20170921072442"]]
+  [1m[35m (17.8ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mActiveRecord::InternalMetadata Load (1.0ms)[0m  [1m[34mSELECT  "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1 LIMIT $2[0m  [["key", "environment"], ["LIMIT", 1]]
+  [1m[35m (0.6ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (1.1ms)[0m  [1m[32mINSERT INTO "ar_internal_metadata" ("key", "value", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "key"[0m  [["key", "environment"], ["value", "development"], ["created_at", "2017-10-16 16:55:43.144792"], ["updated_at", "2017-10-16 16:55:43.144792"]]
+  [1m[35m (13.1ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.8ms)[0m  [1m[34mSELECT pg_advisory_unlock(2808627241692089685)[0m
+  [1m[35m (0.9ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Started POST "/notifications" for 127.0.0.1 at 2017-10-16 11:56:59 -0500
+  [1m[35m (0.6ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Processing by NotificationsController#create as HTML
+  Parameters: {"username"=>"janoguerab", "sender"=>"janoguerab", "notification"=>{"username"=>"janoguerab", "sender"=>"janoguerab"}}
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.5ms)[0m  [1m[32mINSERT INTO "notifications" ("username", "sender", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["username", "janoguerab"], ["sender", "janoguerab"], ["created_at", "2017-10-16 16:57:00.302753"], ["updated_at", "2017-10-16 16:57:00.302753"]]
+  [1m[35m (16.0ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mRpush::Client::ActiveRecord::Gcm::App Load (0.8ms)[0m  [1m[34mSELECT  "rpush_apps".* FROM "rpush_apps" WHERE "rpush_apps"."type" IN ('Rpush::Client::ActiveRecord::Gcm::App') AND "rpush_apps"."name" = $1 LIMIT $2[0m  [["name", "android_app"], ["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mRpush::Client::ActiveRecord::App Exists (0.3ms)[0m  [1m[34mSELECT  1 AS one FROM "rpush_apps" WHERE "rpush_apps"."name" = $1 AND "rpush_apps"."type" = $2 AND "rpush_apps"."environment" IS NULL LIMIT $3[0m  [["name", "android_app"], ["type", "Rpush::Client::ActiveRecord::Gcm::App"], ["LIMIT", 1]]
+  [1m[35mSQL (0.4ms)[0m  [1m[32mINSERT INTO "rpush_apps" ("name", "created_at", "updated_at", "type", "auth_key") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["name", "android_app"], ["created_at", "2017-10-16 16:57:00.367906"], ["updated_at", "2017-10-16 16:57:00.367906"], ["type", "Rpush::Client::ActiveRecord::Gcm::App"], ["auth_key", "..."]]
+  [1m[35m (17.3ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mUserDevice Load (0.3ms)[0m  [1m[34mSELECT "user_devices"."device_id" FROM "user_devices" WHERE "user_devices"."username" = $1[0m  [["username", "janoguerab"]]
+Completed 201 Created in 94ms (Views: 0.1ms | ActiveRecord: 47.2ms)
+
+
+Started POST "/notifications" for 127.0.0.1 at 2017-10-16 12:26:19 -0500
+Processing by NotificationsController#create as HTML
+  Parameters: {"username"=>"janoguerab", "sender"=>"janoguerab", "notification"=>{"username"=>"janoguerab", "sender"=>"janoguerab"}}
+  [1m[35m (0.5ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (1.1ms)[0m  [1m[32mINSERT INTO "notifications" ("username", "sender", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["username", "janoguerab"], ["sender", "janoguerab"], ["created_at", "2017-10-16 17:26:19.698334"], ["updated_at", "2017-10-16 17:26:19.698334"]]
+  [1m[35m (14.7ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mRpush::Client::ActiveRecord::Gcm::App Load (0.9ms)[0m  [1m[34mSELECT  "rpush_apps".* FROM "rpush_apps" WHERE "rpush_apps"."type" IN ('Rpush::Client::ActiveRecord::Gcm::App') AND "rpush_apps"."name" = $1 LIMIT $2[0m  [["name", "android_app"], ["LIMIT", 1]]
+  [1m[36mUserDevice Load (1.1ms)[0m  [1m[34mSELECT "user_devices"."device_id" FROM "user_devices" WHERE "user_devices"."username" = $1[0m  [["username", "janoguerab"]]
+Completed 201 Created in 171ms (Views: 0.2ms | ActiveRecord: 18.9ms)
+
+
+Started POST "/notifications" for 127.0.0.1 at 2017-10-16 12:28:36 -0500
+Processing by NotificationsController#create as HTML
+  Parameters: {"username"=>"janoguerab", "sender"=>"janoguerab", "notification"=>{"username"=>"janoguerab", "sender"=>"janoguerab"}}
+  [1m[35m (0.4ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (1.0ms)[0m  [1m[32mINSERT INTO "notifications" ("username", "sender", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["username", "janoguerab"], ["sender", "janoguerab"], ["created_at", "2017-10-16 17:28:36.676337"], ["updated_at", "2017-10-16 17:28:36.676337"]]
+  [1m[35m (5.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mRpush::Client::ActiveRecord::Gcm::App Load (0.7ms)[0m  [1m[34mSELECT  "rpush_apps".* FROM "rpush_apps" WHERE "rpush_apps"."type" IN ('Rpush::Client::ActiveRecord::Gcm::App') AND "rpush_apps"."name" = $1 LIMIT $2[0m  [["name", "android_app"], ["LIMIT", 1]]
+  [1m[36mUserDevice Load (0.6ms)[0m  [1m[34mSELECT "user_devices"."device_id" FROM "user_devices" WHERE "user_devices"."username" = $1[0m  [["username", "janoguerab"]]
+Completed 201 Created in 17ms (Views: 0.2ms | ActiveRecord: 8.0ms)
+
+
+Started POST "/notifications" for 127.0.0.1 at 2017-10-16 12:32:01 -0500
+Processing by NotificationsController#create as HTML
+  Parameters: {"username"=>"janoguerab", "sender"=>"janoguerab", "notification"=>{"username"=>"janoguerab", "sender"=>"janoguerab"}}
+  [1m[35m (0.4ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (0.7ms)[0m  [1m[32mINSERT INTO "notifications" ("username", "sender", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["username", "janoguerab"], ["sender", "janoguerab"], ["created_at", "2017-10-16 17:32:01.157739"], ["updated_at", "2017-10-16 17:32:01.157739"]]
+  [1m[35m (11.5ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mRpush::Client::ActiveRecord::Gcm::App Load (0.8ms)[0m  [1m[34mSELECT  "rpush_apps".* FROM "rpush_apps" WHERE "rpush_apps"."type" IN ('Rpush::Client::ActiveRecord::Gcm::App') AND "rpush_apps"."name" = $1 LIMIT $2[0m  [["name", "android_app"], ["LIMIT", 1]]
+  [1m[36mUserDevice Load (0.8ms)[0m  [1m[34mSELECT "user_devices"."device_id" FROM "user_devices" WHERE "user_devices"."username" = $1[0m  [["username", "janoguerab"]]
+Completed 201 Created in 21ms (Views: 0.2ms | ActiveRecord: 14.1ms)
+
+
+Started POST "/notifications" for 127.0.0.1 at 2017-10-16 12:33:00 -0500
+Processing by NotificationsController#create as HTML
+  Parameters: {"username"=>"janoguerab", "sender"=>"janoguerab", "notification"=>{"username"=>"janoguerab", "sender"=>"janoguerab"}}
+  [1m[35m (0.7ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (1.2ms)[0m  [1m[32mINSERT INTO "notifications" ("username", "sender", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["username", "janoguerab"], ["sender", "janoguerab"], ["created_at", "2017-10-16 17:33:00.470046"], ["updated_at", "2017-10-16 17:33:00.470046"]]
+  [1m[35m (11.1ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mRpush::Client::ActiveRecord::Gcm::App Load (0.9ms)[0m  [1m[34mSELECT  "rpush_apps".* FROM "rpush_apps" WHERE "rpush_apps"."type" IN ('Rpush::Client::ActiveRecord::Gcm::App') AND "rpush_apps"."name" = $1 LIMIT $2[0m  [["name", "android_app"], ["LIMIT", 1]]
+  [1m[36mUserDevice Load (0.8ms)[0m  [1m[34mSELECT "user_devices"."device_id" FROM "user_devices" WHERE "user_devices"."username" = $1[0m  [["username", "janoguerab"]]
+Completed 201 Created in 25ms (Views: 0.2ms | ActiveRecord: 14.7ms)
+
+
+Started POST "/notifications" for 127.0.0.1 at 2017-10-16 13:19:09 -0500
+Processing by NotificationsController#create as HTML
+  Parameters: {"username"=>"janoguerab", "sender"=>"janoguerab", "notification"=>{"username"=>"janoguerab", "sender"=>"janoguerab"}}
+  [1m[35m (414.8ms)[0m  [1m[35mBEGIN[0m
+  [1m[35mSQL (21.4ms)[0m  [1m[32mINSERT INTO "notifications" ("username", "sender", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["username", "janoguerab"], ["sender", "janoguerab"], ["created_at", "2017-10-16 18:19:20.418998"], ["updated_at", "2017-10-16 18:19:20.418998"]]
+  [1m[35m (61.4ms)[0m  [1m[35mCOMMIT[0m
+  [1m[36mRpush::Client::ActiveRecord::Gcm::App Load (10.5ms)[0m  [1m[34mSELECT  "rpush_apps".* FROM "rpush_apps" WHERE "rpush_apps"."type" IN ('Rpush::Client::ActiveRecord::Gcm::App') AND "rpush_apps"."name" = $1 LIMIT $2[0m  [["name", "android_app"], ["LIMIT", 1]]
+  [1m[36mUserDevice Load (1.4ms)[0m  [1m[34mSELECT "user_devices"."device_id" FROM "user_devices" WHERE "user_devices"."username" = $1[0m  [["username", "janoguerab"]]
+Completed 201 Created in 7906ms (Views: 89.1ms | ActiveRecord: 509.4ms)
+
+

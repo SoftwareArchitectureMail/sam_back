@@ -1,0 +1,4 @@
+sam-notifications-ms:
+  scale: 2
+sam-notifications-db:
+  scale: 2
