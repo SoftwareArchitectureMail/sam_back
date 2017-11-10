@@ -1,0 +1,21 @@
+version: '2'
+services:
+  sam-sendmail-db:
+    container_name: 'sam-sendmail-db'
+    image: mysql
+    ports:
+      - "8806:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+      MYSQL_USER: arqsoft
+      MYSQL_PASSWORD: 123
+      MYSQL_DATABASE: sentMails
+      MYSQL_HOST: sam-sendmail-db
+  sam-sendmail-ms:
+    container_name: 'sam_sendmail_ms'
+    image: akosoriod/sam-sendmail-ms
+    command: bash -c "sleep 40 && rm -f tmp/pids/server.pid && bundle exec rails db:migrate && bundle exec rails s -p 3001 -b '0.0.0.0'"
+    ports:
+      - "3001:3001"
+    depends_on:
+      - sam-sendmail-db

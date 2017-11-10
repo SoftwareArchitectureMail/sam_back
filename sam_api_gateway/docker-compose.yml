@@ -1,7 +1,0 @@
-version: '2'
-services:
-  sam_api_gateway:
-    build: .
-    command: bash -c "sleep 40 && rm -f tmp/pids/server.pid && bundle exec rails s -p 4000 -b '0.0.0.0'"
-    ports:
-      - "4000:4000"

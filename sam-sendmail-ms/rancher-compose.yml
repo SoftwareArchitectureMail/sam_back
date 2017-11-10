@@ -1,0 +1,4 @@
+sam-sendmail-ms:
+  scale: 2
+sam-sendmail-db:
+  scale: 2
