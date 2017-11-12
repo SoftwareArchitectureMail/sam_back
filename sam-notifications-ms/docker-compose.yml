@@ -2,15 +2,15 @@ version: '2'
 
 services:
   sam-notifications-db:
-    image: postgres
+    image: mysql
     ports:
-      - "8810:5432"
+      - "8812:8812"
     environment:
-      POSTGRES_ROOT_PASSWORD: 1234
-      POSTGRES_USER: notification
-      POSTGRES_PASSWORD: 1234
-      POSTGRES_DATABASE: notifications-db
-      POSTGRES_HOST: sam-notifications-db
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_USER: notification
+      MYSQL_PASSWORD: 1234
+      MYSQL_DATABASE: notifications-db
+      MYSQL_HOST: sam-notifications-db
   sam-notifications-ms:
     image: akosoriod/sam_notifications_ms
     command: bash -c "sleep 40 && rm -f tmp/pids/server.pid && bundle exec rails db:migrate && bundle exec rails s -p 3003 -b '0.0.0.0'"
