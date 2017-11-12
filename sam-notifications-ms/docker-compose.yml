@@ -1,10 +1,9 @@
 version: '2'
-
 services:
   sam-notifications-db:
     image: mysql
     ports:
-      - "8812:8812"
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: 1234
       MYSQL_USER: notification
@@ -12,7 +11,7 @@ services:
       MYSQL_DATABASE: notifications-db
       MYSQL_HOST: sam-notifications-db
   sam-notifications-ms:
-    image: akosoriod/sam_notifications_ms
+    build: .
     command: bash -c "sleep 40 && rm -f tmp/pids/server.pid && bundle exec rails db:migrate && bundle exec rails s -p 3003 -b '0.0.0.0'"
     ports:
       - "3003:3003"

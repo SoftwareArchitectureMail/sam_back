@@ -15,7 +15,7 @@ default: &default
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   username: notification
   password: 1234
-  host: sam_notifications_db
+  host: sam-notifications-db
   socket: /var/run/mysqld/mysqld.sock
 
 development:
@@ -31,4 +31,6 @@ test:
 
 production:
   <<: *default
-  database: notifications_db
+  database: sam-notifications-ms-production
+  username: sam-notifications-ms
+  password: <%= ENV['SAM_REGISTER_MS_DATABASE_PASSWORD'] %>
