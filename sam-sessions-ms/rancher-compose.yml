@@ -1,0 +1,2 @@
+sam-api-gateway:
+  scale: 2

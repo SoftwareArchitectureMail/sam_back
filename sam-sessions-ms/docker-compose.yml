@@ -1,0 +1,18 @@
+version: '2'
+services:
+  sam-sessions-db:
+    image: mysql
+    ports:
+      - "8814:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+      MYSQL_USER: arqsoft
+      MYSQL_PASSWORD: 123
+      MYSQL_DATABASE: sessions
+      MYSQL_HOST: sam_sessions_db
+  sam-sessions-ms:
+    image: davsanba/sam_sessions_ms
+    ports:
+      - "3005:3005"
+    depends_on:
+      - sam-sessions-db

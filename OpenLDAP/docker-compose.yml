@@ -29,7 +29,7 @@ services:
         #LDAP_REPLICATION_HOSTS: "#PYTHON2BASH:['ldap://ldap.example.org','ldap://ldap2.example.org']"
         LDAP_REMOVE_CONFIG_AFTER_SETUP: "true"
         LDAP_SSL_HELPER_PREFIX: "ldap"
-      tty: true
+      #tty: true
       stdin_open: true
       volumes:
         - /var/lib/ldap
