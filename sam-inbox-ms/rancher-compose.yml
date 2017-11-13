@@ -1,0 +1,4 @@
+sam-inbox-ms:
+  scale: 2
+sam-inbox-db:
+  scale: 1

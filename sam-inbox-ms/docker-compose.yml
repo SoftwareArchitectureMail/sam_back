@@ -1,0 +1,19 @@
+version: '2'
+services:
+  sam-inbox-db:
+    image: mysql
+    ports:
+      - "8808:8808"
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_USER: arqsoft
+      MYSQL_PASSWORD: 1234
+      MYSQL_DATABASE: inbox
+      MYSQL_HOST: sam-inbox-db
+  sam-inbox-ms:
+    build: .
+    command: bash -c "sleep 40 && rm -f tmp/pids/server.pid && bundle exec rails db:migrate && bundle exec rails s -p 3002 -b '0.0.0.0'"
+    ports:
+      - "3002:3002"
+    depends_on:
+      - sam-inbox-db
