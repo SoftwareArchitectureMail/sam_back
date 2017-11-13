@@ -27,7 +27,6 @@ gem 'rack-cors'
 gem 'therubyracer', :platforms => :ruby
 gem 'execjs'
 gem 'httparty'
-gem 'wash_out'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
