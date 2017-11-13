@@ -13,7 +13,7 @@ services:
       MYSQL_HOST: sam-sendmail-db
   sam-sendmail-ms:
     container_name: 'sam_sendmail_ms'
-    image: akosoriod/sam-sendmail-ms
+    image: davsanba/sam_sendmail_ms
     command: bash -c "sleep 40 && rm -f tmp/pids/server.pid && bundle exec rails db:migrate && bundle exec rails s -p 3001 -b '0.0.0.0'"
     ports:
       - "3001:3001"

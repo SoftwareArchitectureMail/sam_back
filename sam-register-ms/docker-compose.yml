@@ -11,7 +11,7 @@ services:
       MYSQL_DATABASE: users
       MYSQL_HOST: sam-register-db
   sam-register-ms:
-    build: .
+    image: davsanba/sam_register_ms
     command: bash -c "sleep 40 && rm -f tmp/pids/server.pid && bundle exec rails db:migrate && bundle exec rails s -p 3004 -b '0.0.0.0'"
     ports:
       - "3004:3004"
