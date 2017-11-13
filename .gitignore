@@ -6,3 +6,7 @@ sam_api_gateway/tmp/
 names
 
 sam_ldap_ms/\.idea/workspace\.xml
+
+sam-api-gateway/start2\.sh
+
+sam-sendmail-ms/start2\.sh
