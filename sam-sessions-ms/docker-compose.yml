@@ -11,7 +11,7 @@ services:
       MYSQL_DATABASE: sessions
       MYSQL_HOST: sam_sessions_db
   sam-sessions-ms:
-    build: .
+    image: davsanba/sam_sessions_ms
     ports:
       - "3005:3005"
     depends_on:
