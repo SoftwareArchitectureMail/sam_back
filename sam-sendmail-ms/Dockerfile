@@ -1,5 +1,8 @@
 FROM ruby:2.3
 
+RUN ["apt-get", "update"]
+RUN ["apt-get", "install", "-y", "vim"]
+
 RUN mkdir /sam_sendmail_ms
 WORKDIR /sam_sendmail_ms
 
