@@ -16,7 +16,7 @@ default: &default
   username: arqsoft
   password: 123
   #host: localhost
-  host: sam_sendmail_db
+  host: sam-sendmail-db
   port: 3306
   socket: /tmp/mysql.sock
 

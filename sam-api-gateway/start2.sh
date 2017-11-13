@@ -1,7 +1,7 @@
 ./rancher-compose --project-name sam-api-gateway \
 --url http://192.168.99.100:8080/v1/projects/1a5 \
---access-key 17B819D37C677E4AACF9 \
---secret-key U9rcWjTwLDeCoWrj54HnBNJue122xhXb4NbBahQU \
+--access-key 2DF5454AE1FCEB3FE3D8 \
+--secret-key Rktvu2sw9oamVnRH9cYef2fZrzL9JPcyyviQfvSJ \
 -f docker-compose.yml \
 --verbose up \
 -d --force-upgrade \
