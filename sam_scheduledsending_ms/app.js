@@ -9,7 +9,7 @@ const NodeCouchDb = require('node-couchdb');
 
 // node-couchdb instance talking to external service
 const couch = new NodeCouchDb({
-    host: '192.168.99.101',
+    host: 'couchdb.server',
     protocl: 'https',
     port: '5984'
 });
