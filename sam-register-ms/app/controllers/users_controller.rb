@@ -14,6 +14,10 @@ class UsersController < ApplicationController
     render json: @user
   end
 
+  def test
+    render json: "this is just a test"
+  end
+
   # GET /user/username
   def show_username
     if @user.blank?
