@@ -1,6 +1,6 @@
 version: '2'
 services:
-  sam_scheduledsending_db:
+  sam-scheduledsending-db:
     image: "couchdb:1.6.1"
     hostname: couchdb.server
     environment:
@@ -8,8 +8,9 @@ services:
       COUCHDB_PASSWORD: admin
     ports:
       - "5984:5984"
-  sam_scheduledsending_ms:
-    build: .
+  sam-scheduledsending-ms:
+    #build: .
+    image: akosoriod/scheduledsending
     command: node app
     volumes:
       - .:/usr/app/
@@ -17,4 +18,4 @@ services:
     ports:
       - "3006:3006"
     depends_on:
-      - sam_scheduledsending_db
+      - sam-scheduledsending-db

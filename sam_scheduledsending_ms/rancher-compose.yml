@@ -1,0 +1,4 @@
+sam-scheduledsending-ms:
+  scale: 2
+sam-scheduledsending-db:
+  scale: 2
